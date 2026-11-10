@@ -149,6 +149,21 @@ Window {
         visible: OverlayController.keyboardMode ||
                  (win.passiveView === "keyboard" && OverlayController.panelVisible)
         opacity: win.onItsOutput ? 1 : 0
+        scale: win.onItsOutput ? 1 : 0.985
+        Behavior on opacity {
+            enabled: theme.animationsEnabled
+            NumberAnimation {
+                duration: theme.cardAnimationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on scale {
+            enabled: theme.animationsEnabled
+            NumberAnimation {
+                duration: theme.cardAnimationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     QuickActionsBody {
@@ -160,6 +175,21 @@ Window {
         visible: !OverlayController.keyboardMode && win.passiveView === "quick-actions"
                  && OverlayController.panelVisible
         opacity: win.onItsOutput ? 1 : 0
+        scale: win.onItsOutput ? 1 : 0.985
+        Behavior on opacity {
+            enabled: theme.animationsEnabled
+            NumberAnimation {
+                duration: theme.cardAnimationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on scale {
+            enabled: theme.animationsEnabled
+            NumberAnimation {
+                duration: theme.cardAnimationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     RadialActionsBody {
@@ -171,6 +201,21 @@ Window {
         visible: !OverlayController.keyboardMode && win.passiveView === "radial"
                  && OverlayController.panelVisible
         opacity: win.onItsOutput ? 1 : 0
+        scale: win.onItsOutput ? 1 : 0.985
+        Behavior on opacity {
+            enabled: theme.animationsEnabled
+            NumberAnimation {
+                duration: theme.cardAnimationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on scale {
+            enabled: theme.animationsEnabled
+            NumberAnimation {
+                duration: theme.cardAnimationDuration
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     // The same panel again, off screen, against the same bound: it reads that

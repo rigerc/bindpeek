@@ -297,6 +297,7 @@ private slots:
     void theFiringColumnSurvivesTheTransparency();
     void theHousePaletteMeetsTheMeasureItSetsItself();
     void positionListsAgree();
+    void keycapAnimationResourcesArePackaged();
 };
 
 void TestQmlContract::bothFilesAreReadable() {
@@ -659,5 +660,25 @@ void TestQmlContract::positionListsAgree() {
                  name);
     }
 }
+// The same keycap animations must work in the overlay and the editor preview;
+// forgetting the editor resource would leave the settings window blank.
+void TestQmlContract::keycapAnimationResourcesArePackaged() {
+    const QString cmake = readFile(QStringLiteral(BINDPEEK_SRC "/CMakeLists.txt"));
+    QVERIFY(!cmake.isEmpty());
+    QCOMPARE(cmake.count(QStringLiteral("AnimatedKeycap.qml")), 2);
+
+    const QString visual = readFile(QStringLiteral(BINDPEEK_SRC "/AnimatedKeycap.qml"));
+    QVERIFY(!visual.isEmpty());
+    QVERIFY(visual.contains(QStringLiteral("Behavior on color")));
+    QVERIFY(visual.contains(QStringLiteral("Behavior on scale")));
+    QVERIFY(visual.contains(QStringLiteral("animationsEnabled")));
+
+    for (const char *path : {"KeyboardBoard.qml", "QuickActionsBody.qml",
+                             "RadialActionsBody.qml"}) {
+        const QString layout = readFile(QStringLiteral(BINDPEEK_SRC "/") + QLatin1String(path));
+        QVERIFY2(layout.contains(QStringLiteral("AnimatedKeycap")), path);
+    }
+}
+
 QTEST_APPLESS_MAIN(TestQmlContract)
 #include "test_qml_contract.moc"
