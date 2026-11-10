@@ -68,6 +68,35 @@ ColumnLayout {
             // colour that sits below that undimmed anyway. What is one key
             // further on would then be the least readable thing on the panel.
             color: block.entry.deeper ? block.theme.text : block.theme.brand
+            Behavior on color {
+                enabled: block.theme.animationsEnabled
+                ColorAnimation { duration: block.theme.keyAnimationDuration }
+            }
+
+            // A compact, translucent keycap frame, drawn behind the existing
+            // text without altering the list's measured column widths.
+            Rectangle {
+                x: -Math.max(2, block.theme.paddingPill / 3)
+                y: -2
+                width: Math.min(parent.width + Math.max(2, block.theme.paddingPill / 3),
+                                parent.paintedWidth + block.theme.paddingPill)
+                height: parent.height + 4
+                radius: block.theme.radiusPill
+                color: block.theme.surfaceHover
+                border.width: block.theme.borderWidthKey
+                border.color: block.entry.deeper ? block.theme.borderFocus
+                                                 : block.theme.brand
+                opacity: block.entry.deeper ? 0.35 : 0.65
+                z: -1
+                Behavior on opacity {
+                    enabled: block.theme.animationsEnabled
+                    NumberAnimation { duration: block.theme.keyAnimationDuration }
+                }
+                Behavior on border.color {
+                    enabled: block.theme.animationsEnabled
+                    ColorAnimation { duration: block.theme.keyAnimationDuration }
+                }
+            }
             font.family: block.theme.fontFamilyMono
             font.pixelSize: block.theme.fontSizeBody
             elide: Text.ElideRight

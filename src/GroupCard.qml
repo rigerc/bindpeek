@@ -468,6 +468,27 @@ ColumnLayout {
                                 border.color: card.theme.brand
                                 border.width: card.theme.borderWidthKey
 
+                                // The section modifier caps share the same
+                                // subtle illuminated edges as physical keys.
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: -3
+                                    radius: keyCap.radius + 3
+                                    color: "transparent"
+                                    border.width: 2
+                                    border.color: card.theme.brand
+                                    opacity: 0.38
+                                    z: -1
+                                }
+                                Behavior on color {
+                                    enabled: card.theme.animationsEnabled
+                                    ColorAnimation { duration: card.theme.keyAnimationDuration }
+                                }
+                                Behavior on border.color {
+                                    enabled: card.theme.animationsEnabled
+                                    ColorAnimation { duration: card.theme.keyAnimationDuration }
+                                }
+
                                 Text {
                                     id: capLabel
                                     anchors.centerIn: parent

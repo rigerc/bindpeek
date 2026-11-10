@@ -92,6 +92,7 @@ Item {
                 Repeater {
                     model: root.shown
                     delegate: Rectangle {
+                        id: actionRow
                         required property var modelData
                         required property int index
                         readonly property bool exact:
@@ -102,29 +103,38 @@ Item {
                         color: exact ? root.theme.surfaceHover : root.theme.surface
                         border.width: exact ? 2 : 1
                         border.color: exact ? root.theme.accent : root.theme.border
+                        // The row frames use the palette accent, while
+                        // keyboard highlights still distinguish exact matches.
+                        scale: exact ? 1.01 : 1
+                        Behavior on scale {
+                            enabled: root.theme.animationsEnabled
+                            NumberAnimation {
+                                duration: root.theme.cardAnimationDuration
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                        Behavior on color {
+                            enabled: root.theme.animationsEnabled
+                            ColorAnimation { duration: root.theme.cardAnimationDuration }
+                        }
+                        Behavior on border.color {
+                            enabled: root.theme.animationsEnabled
+                            ColorAnimation { duration: root.theme.cardAnimationDuration }
+                        }
 
-                        Rectangle {
+                        AnimatedKeycap {
                             id: keycap
                             x: root.gap / 2
                             anchors.verticalCenter: parent.verticalCenter
                             width: Math.max(44, root.theme.fontSizeBody * 3.6)
                             height: parent.height - root.gap
                             radius: root.theme.radiusPill
-                            color: root.theme.background
-                            border.color: exact ? root.theme.accent : root.theme.borderFocus
-                            border.width: 1
-                            Text {
-                                anchors.fill: parent
-                                anchors.margins: 3
-                                verticalAlignment: Text.AlignVCenter
-                                horizontalAlignment: Text.AlignHCenter
-                                text: modelData.key || "?"
-                                color: root.theme.text
-                                font.family: root.theme.fontFamilyMono
-                                font.bold: true
-                                font.pixelSize: Math.max(10, root.theme.fontSizeBody)
-                                elide: Text.ElideRight
-                            }
+                            theme: root.theme
+                            caption: modelData.key || "?"
+                            available: true
+                            exact: actionRow.exact
+                            centered: true
+                            captionSize: Math.max(10, root.theme.fontSizeBody)
                         }
                         Text {
                             x: keycap.x + keycap.width + root.gap

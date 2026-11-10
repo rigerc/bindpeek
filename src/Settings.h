@@ -90,6 +90,9 @@ public:
     // list, keyboard, quick actions or radial. The toggle stays independent.
     QString overlayView() const;
 
+    // Nonessential keycap and card transitions; disabling preserves highlight colors.
+    bool animationsEnabled() const;
+
     // How the shortcuts that need a further modifier are shown. One of
     // knownDisclosures(); see the words there for what each does.
     QString disclosure() const;
@@ -236,6 +239,7 @@ public:
 
     void setShowDelayMs(int value);
     void setOverlayView(const QString &value);
+    void setAnimationsEnabled(bool value);
     void setPosition(Position value);
     void setMarginPx(int value);
     void setEdgeInsetPx(int value);
@@ -294,6 +298,7 @@ private:
     int m_showDelayMs;
     QString m_overlayView;
     bool m_overlayEnabled;
+    bool m_animationsEnabled;
     QString m_disclosure;
     QString m_arrangement;
     QString m_alignment;

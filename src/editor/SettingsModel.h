@@ -34,6 +34,8 @@ class SettingsModel : public QObject {
                    NOTIFY changed)
     Q_PROPERTY(QString overlayView READ overlayView WRITE setOverlayView
                    NOTIFY changed)
+    Q_PROPERTY(bool animationsEnabled READ animationsEnabled WRITE setAnimationsEnabled
+                   NOTIFY changed)
     Q_PROPERTY(
         QString disclosure READ disclosure WRITE setDisclosure NOTIFY changed)
     Q_PROPERTY(QString arrangement READ arrangement WRITE setArrangement NOTIFY
@@ -106,6 +108,7 @@ public:
     int edgeInsetPx() const;
     bool overlayEnabled() const;
     QString overlayView() const;
+    bool animationsEnabled() const;
     QString disclosure() const;
     QString arrangement() const;
     QString alignment() const;
@@ -126,6 +129,7 @@ public:
     void setEdgeInsetPx(int value);
     void setOverlayEnabled(bool value);
     void setOverlayView(const QString &value);
+    void setAnimationsEnabled(bool value);
     void setDisclosure(const QString &value);
     void setArrangement(const QString &value);
     void setAlignment(const QString &value);

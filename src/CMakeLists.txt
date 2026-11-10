@@ -10,6 +10,7 @@ set(BINDPEEK_OVERLAY_QML
   Overlay.qml
   KeyboardBody.qml
   KeyboardBoard.qml
+  AnimatedKeycap.qml
   QuickActionsBody.qml
   RadialActionsBody.qml
   ShortcutPresentation.js
@@ -31,6 +32,7 @@ set(BINDPEEK_EDITOR_QML
   editor/ThemedToolTip.qml
   KeyboardBody.qml
   KeyboardBoard.qml
+  AnimatedKeycap.qml
   QuickActionsBody.qml
   RadialActionsBody.qml
   ShortcutPresentation.js

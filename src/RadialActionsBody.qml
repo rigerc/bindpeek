@@ -107,6 +107,14 @@ Item {
                 color: root.theme.surfaceHover
                 border.color: root.theme.accent
                 border.width: 3
+                scale: Math.min(1.08, 1 + root.held.length * 0.025)
+                Behavior on scale {
+                    enabled: root.theme.animationsEnabled
+                    NumberAnimation {
+                        duration: root.theme.cardAnimationDuration
+                        easing.type: Easing.OutCubic
+                    }
+                }
                 Text {
                     anchors.fill: parent
                     anchors.margins: 6
@@ -125,6 +133,7 @@ Item {
             Repeater {
                 model: root.shown
                 delegate: Rectangle {
+                    id: radialCard
                     required property var modelData
                     required property int index
                     readonly property bool exact:
@@ -137,29 +146,32 @@ Item {
                     color: root.theme.surface
                     border.color: exact ? root.theme.accent : root.theme.borderFocus
                     border.width: exact ? 2 : 1
+                    scale: exact ? 1.015 : 1
+                    Behavior on scale {
+                        enabled: root.theme.animationsEnabled
+                        NumberAnimation {
+                            duration: root.theme.cardAnimationDuration
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                    Behavior on border.color {
+                        enabled: root.theme.animationsEnabled
+                        ColorAnimation { duration: root.theme.cardAnimationDuration }
+                    }
                     Row {
                         anchors.centerIn: parent
                         spacing: root.gap / 2
-                        Rectangle {
+                        AnimatedKeycap {
                             id: actionKey
                             width: Math.max(31, root.theme.fontSizeBody * 2.4)
                             height: Math.max(28, root.theme.fontSizeBody * 2.2)
                             radius: root.theme.radiusPill
-                            color: root.theme.surfaceHover
-                            border.color: exact ? root.theme.accent : root.theme.borderFocus
-                            border.width: 1
-                            Text {
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                verticalAlignment: Text.AlignVCenter
-                                horizontalAlignment: Text.AlignHCenter
-                                text: modelData.key || "?"
-                                color: root.theme.text
-                                font.family: root.theme.fontFamilyMono
-                                font.pixelSize: Math.max(10, root.theme.fontSizeBody)
-                                font.bold: true
-                                elide: Text.ElideRight
-                            }
+                            theme: root.theme
+                            caption: modelData.key || "?"
+                            available: true
+                            exact: radialCard.exact
+                            centered: true
+                            captionSize: Math.max(10, root.theme.fontSizeBody)
                         }
                         Text {
                             width: root.cardWidth - actionKey.width - root.gap * 2
