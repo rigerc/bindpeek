@@ -117,6 +117,7 @@ private slots:
     void theSurfaceNeverGoesDownAtTheMomentItIsNeeded();
     void keyboardModeIgnoresAutomaticDismissal();
     void keyboardModeExposesAllBindings();
+    void keyboardOnlyRequiresExplicitToggle();
 };
 
 void TestOverlay::headingsAppearOnceEachAndInSourceOrder() {
@@ -455,6 +456,32 @@ void TestOverlay::keyboardModeExposesAllBindings() {
     QCOMPARE(first.value(QStringLiteral("group")).toString(), QStringLiteral("Apps"));
     emit watch.heldChanged({QStringLiteral("SUPER")});
     QCOMPARE(controller.keyboardBinds().size(), 2);
+}
+
+void TestOverlay::keyboardOnlyRequiresExplicitToggle() {
+    WatchClient watch;
+    auto source = std::make_unique<StubSource>(QList<Bind>{
+        bind({QStringLiteral("SUPER")}, QStringLiteral("T"),
+             QStringLiteral("Apps"))});
+    OverlayController controller(std::move(source), &watch, kShowDelayMs);
+    QVERIFY(controller.reload());
+    controller.setKeyboardOnly(true);
+    emit watch.heldChanged({QStringLiteral("SUPER")});
+    QTest::qWait(kShowDelayMs * kWaitFactor);
+    QVERIFY(!controller.isPanelVisible());
+    QVERIFY(!controller.isPanelPending());
+
+    controller.toggleKeyboard();
+    QVERIFY(controller.isPanelVisible());
+    emit watch.shortcutTaken();
+    QVERIFY(controller.isPanelVisible());
+    controller.closeKeyboard();
+    QVERIFY(!controller.isPanelVisible());
+
+    emit watch.heldChanged({});
+    controller.setKeyboardOnly(false);
+    emit watch.heldChanged({QStringLiteral("SUPER")});
+    QTRY_VERIFY(controller.isPanelVisible());
 }
 
 #include "test_overlay.moc"
