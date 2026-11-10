@@ -111,6 +111,21 @@ void OverlayController::setShowDelayMs(int value) {
     m_delay.setInterval(value);
 }
 
+void OverlayController::setKeyboardOnly(bool enabled) {
+    if (m_keyboardOnly == enabled) {
+        return;
+    }
+    m_keyboardOnly = enabled;
+    if (m_keyboardMode) {
+        return;
+    }
+    stopDelay();
+    setPanelVisible(false);
+    if (!m_keyboardOnly && answersHeld() && !m_suppressed) {
+        startDelay();
+    }
+}
+
 void OverlayController::setShowsDeeper(bool value) {
     if (m_showsDeeper == value) {
         return;
@@ -206,6 +221,16 @@ void OverlayController::onHeldChanged(const QStringList &held) {
     m_held = held;
     if (m_keyboardMode) {
         rebuild();
+        return;
+    }
+
+    if (m_keyboardOnly) {
+        // Keyboard view opens by explicit toggle, not with every modifier.
+        if (m_held.isEmpty()) {
+            m_suppressed = false;
+        }
+        stopDelay();
+        setPanelVisible(false);
         return;
     }
 
