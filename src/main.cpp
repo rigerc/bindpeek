@@ -484,6 +484,8 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
     // The single-instance lock means only this process can remove a stale
     // socket left behind by a previous crash.
     QLocalServer toggleServer;
+    // Also restrict access if RuntimeLocation falls back to a shared temp dir.
+    toggleServer.setSocketOptions(QLocalServer::UserAccessOption);
     const QString socketPath = toggleSocketPath();
     QLocalServer::removeServer(socketPath);
     if (!toggleServer.listen(socketPath)) {

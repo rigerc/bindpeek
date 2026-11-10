@@ -41,8 +41,8 @@ shortcut still fires when you complete it.
   really uses
 - Appears while a modifier is held and goes when it is released, after a delay
   you set
-- Never takes the focus and never eats a key: the panel is a bystander, so the
-  combination you are looking at still works
+- The automatic hold-to-show panel never takes focus or eats keys; the
+  separately toggled keyboard view captures input while you explore shortcuts
 - Narrows the list as you add modifiers, and shows what a further modifier
   would reach in one of four ways
 - Reads the source again before every appearance, so an edited configuration is

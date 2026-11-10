@@ -20,7 +20,9 @@ Item {
     focus: true
     onVisibleChanged: if (visible) forceActiveFocus()
     Keys.onPressed: event => {
-        if (event.key === Qt.Key_Escape) {
+        // When a compositor forwards the binding, Super+K toggles off too.
+        if (event.key === Qt.Key_Escape ||
+                (event.key === Qt.Key_K && (event.modifiers & Qt.MetaModifier))) {
             OverlayController.closeKeyboard()
             event.accepted = true
         }
