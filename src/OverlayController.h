@@ -66,6 +66,8 @@ public:
     // Takes changed settings while running, so the editor live saving reaches
     // the panel without a restart.
     void setShowDelayMs(int value);
+    // Suppress passive shortcut-list popups in keyboard-only view.
+    void setKeyboardOnly(bool enabled);
 
     // Whether the panel answers with everything the held keys can still reach
     // or only with what fires this instant. See Settings::showsDeeper().
@@ -142,6 +144,7 @@ private:
 
     bool m_panelVisible = false;
     bool m_keyboardMode = false;
+    bool m_keyboardOnly = false;
 };
 
 } // namespace bindpeek
