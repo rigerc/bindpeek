@@ -436,8 +436,7 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
     controller->setShowsDeeper(settings.showsDeeper());
     controller->setIgnoreLoneShift(settings.ignoreLoneShift());
     controller->setArrangesByModifier(settings.arrangesByModifier());
-    controller->setKeyboardView(settings.overlayView() ==
-                                QLatin1String(overlayView::kKeyboard));
+    controller->setOverlayView(settings.overlayView());
     if (!controller->reload()) {
         err << controller->message() << QChar(QLatin1Char(0x0A));
         return 1;
@@ -493,7 +492,9 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
         // Anchors and margins from the position setting. This is the only
         // surface a compositor places; the preview in the settings window is
         // an item inside that window and is laid out there.
-        applyViewPlacement(layerWindow, settings, controller->keyboardView());
+        applyViewPlacement(layerWindow, settings,
+                           controller->overlayView() !=
+                               QLatin1String(overlayView::kList));
     }
     // The single-instance lock means only this process can remove a stale
     // socket left behind by a previous crash.
@@ -523,7 +524,9 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
                      window, [window, active = controller.get()]() {
         if (auto *layer = LayerShellQt::Window::get(window)) {
             applyViewPlacement(layer, Settings(),
-                               active->keyboardMode() || active->keyboardView());
+                               active->keyboardMode() ||
+                                   active->overlayView() !=
+                                       QLatin1String(overlayView::kList));
             layer->setKeyboardInteractivity(
                 active->keyboardMode()
                     ? LayerShellQt::Window::KeyboardInteractivityExclusive
@@ -549,14 +552,14 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
             controller->setShowsDeeper(fresh.showsDeeper());
             controller->setIgnoreLoneShift(fresh.ignoreLoneShift());
             controller->setArrangesByModifier(fresh.arrangesByModifier());
-            controller->setKeyboardView(fresh.overlayView() ==
-                                        QLatin1String(overlayView::kKeyboard));
+            controller->setOverlayView(fresh.overlayView());
             appearance->apply(fresh);
 
             if (auto *layer = LayerShellQt::Window::get(window)) {
                 applyViewPlacement(layer, fresh,
                                    controller->keyboardMode() ||
-                                       controller->keyboardView());
+                                       controller->overlayView() !=
+                                           QLatin1String(overlayView::kList));
                 // What was just set is double-buffered: the layer-shell
                 // protocol applies anchors and margins at the next commit of
                 // the surface, and Qt commits when it draws. A panel that is

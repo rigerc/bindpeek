@@ -179,7 +179,7 @@ Item {
         }
 
         Text {
-            width: stack.width
+            width: root.orbitWidth
             visible: root.actions.length > 5
             text: qsTr("+%1 more: %2").arg(root.actions.length - 5)
                   .arg(root.actions.slice(5, 8).map(function (item) {

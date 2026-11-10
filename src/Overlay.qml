@@ -60,17 +60,23 @@ Window {
     // own would fight it.
     // Both the interactive toggle and the passive keyboard drawing are
     // centered keyboard-sized surfaces, not full-width/height list bands.
+    // The selector affects presentation, never the passive input behavior.
+    // A --toggle always opens the original full keyboard independently.
+    readonly property string passiveView: OverlayController.overlayView
     readonly property bool drawingKeyboard: OverlayController.keyboardMode
-                                             || OverlayController.keyboardView
+                                             || win.passiveView !== "list"
+    readonly property Item activeVisual:
+        OverlayController.keyboardMode || win.passiveView === "keyboard" ? keyboard
+        : win.passiveView === "quick-actions" ? quickActions
+        : win.passiveView === "radial" ? radialActions
+        : panel
     Binding on width {
         when: win.drawingKeyboard || !Appearance.spanHorizontal
-        value: win.drawingKeyboard ? keyboard.implicitWidth
-                                   : panel.implicitWidth
+        value: win.activeVisual.implicitWidth
     }
     Binding on height {
         when: win.drawingKeyboard || !Appearance.spanVertical
-        value: win.drawingKeyboard ? keyboard.implicitHeight
-                                   : panel.implicitHeight
+        value: win.activeVisual.implicitHeight
     }
 
     // The panel is measured against the output it is actually on. Under a
@@ -141,7 +147,29 @@ Window {
         interactive: OverlayController.keyboardMode
         onCloseRequested: OverlayController.closeKeyboard()
         visible: OverlayController.keyboardMode ||
-                 (OverlayController.keyboardView && OverlayController.panelVisible)
+                 (win.passiveView === "keyboard" && OverlayController.panelVisible)
+        opacity: win.onItsOutput ? 1 : 0
+    }
+
+    QuickActionsBody {
+        id: quickActions
+        anchors.centerIn: parent
+        theme: theme
+        bindings: OverlayController.keyboardBinds
+        held: OverlayController.heldModifiers
+        visible: !OverlayController.keyboardMode && win.passiveView === "quick-actions"
+                 && OverlayController.panelVisible
+        opacity: win.onItsOutput ? 1 : 0
+    }
+
+    RadialActionsBody {
+        id: radialActions
+        anchors.centerIn: parent
+        theme: theme
+        bindings: OverlayController.keyboardBinds
+        held: OverlayController.heldModifiers
+        visible: !OverlayController.keyboardMode && win.passiveView === "radial"
+                 && OverlayController.panelVisible
         opacity: win.onItsOutput ? 1 : 0
     }
 
