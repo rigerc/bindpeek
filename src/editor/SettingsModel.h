@@ -32,6 +32,8 @@ class SettingsModel : public QObject {
         int edgeInsetPx READ edgeInsetPx WRITE setEdgeInsetPx NOTIFY changed)
     Q_PROPERTY(bool overlayEnabled READ overlayEnabled WRITE setOverlayEnabled
                    NOTIFY changed)
+    Q_PROPERTY(QString overlayView READ overlayView WRITE setOverlayView
+                   NOTIFY changed)
     Q_PROPERTY(
         QString disclosure READ disclosure WRITE setDisclosure NOTIFY changed)
     Q_PROPERTY(QString arrangement READ arrangement WRITE setArrangement NOTIFY
@@ -64,6 +66,7 @@ class SettingsModel : public QObject {
     Q_PROPERTY(QStringList positions READ positions CONSTANT)
     Q_PROPERTY(QStringList disclosures READ disclosures CONSTANT)
     Q_PROPERTY(QStringList arrangements READ arrangements CONSTANT)
+    Q_PROPERTY(QStringList overlayViews READ overlayViews CONSTANT)
     // The three words, each under its own name. A list would leave every
     // reader of it to work out from a position which end a word means, and
     // three readers would work it out three times.
@@ -102,6 +105,7 @@ public:
     int marginPx() const;
     int edgeInsetPx() const;
     bool overlayEnabled() const;
+    QString overlayView() const;
     QString disclosure() const;
     QString arrangement() const;
     QString alignment() const;
@@ -121,6 +125,7 @@ public:
     void setMarginPx(int value);
     void setEdgeInsetPx(int value);
     void setOverlayEnabled(bool value);
+    void setOverlayView(const QString &value);
     void setDisclosure(const QString &value);
     void setArrangement(const QString &value);
     void setAlignment(const QString &value);
@@ -139,6 +144,7 @@ public:
     QStringList positions() const;
     QStringList disclosures() const;
     QStringList arrangements() const;
+    QStringList overlayViews() const;
     QString alignmentStart() const;
     QString alignmentCenter() const;
     QString alignmentEnd() const;
