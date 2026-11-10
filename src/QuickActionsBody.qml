@@ -38,9 +38,18 @@ Item {
             width: root.cardWidth
             height: content.implicitHeight + root.padding * 2
             radius: root.theme.radiusPanel
-            color: root.theme.background
+            color: "transparent"
             border.color: root.theme.borderFocus
             border.width: Math.max(1, root.theme.borderWidth)
+
+            // Fade only the plate, never the action text and keycaps.
+            Rectangle {
+                anchors.fill: parent
+                radius: parent.radius
+                color: root.theme.background
+                opacity: root.theme.panelOpacity
+                z: -1
+            }
 
             Column {
                 id: content

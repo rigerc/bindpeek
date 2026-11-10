@@ -40,6 +40,12 @@ Item {
         anchors.fill: parent
         radius: root.theme.radiusPanel
         color: root.theme.background
+        opacity: root.theme.panelOpacity
+    }
+    Rectangle {
+        anchors.fill: parent
+        radius: root.theme.radiusPanel
+        color: "transparent"
         border.color: root.theme.border
         border.width: root.theme.borderWidth
     }
