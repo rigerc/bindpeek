@@ -90,6 +90,19 @@ bool OverlayController::reload() {
     QString error;
     m_binds = m_source->read(&error);
     m_message = error;
+    // Retain every binding: a keyboard starts unfiltered and narrows as
+    // modifier keys are held, unlike the passive panel's grouped model.
+    m_keyboardBinds.clear();
+    m_keyboardBinds.reserve(m_binds.size());
+    for (const Bind &bind : std::as_const(m_binds)) {
+        QVariantMap entry;
+        entry.insert(QStringLiteral("key"), bind.key);
+        entry.insert(QStringLiteral("modifiers"), bind.modifiers);
+        entry.insert(QStringLiteral("description"), bind.description);
+        entry.insert(QStringLiteral("group"), bind.group);
+        entry.insert(QStringLiteral("shortcut"), shortcutText(bind));
+        m_keyboardBinds.append(entry);
+    }
     rebuild();
     return !m_binds.isEmpty();
 }
@@ -135,6 +148,34 @@ QString OverlayController::subtitle() const {
 
 QVariantList OverlayController::groups() const { return m_groups; }
 
+QVariantList OverlayController::keyboardBinds() const { return m_keyboardBinds; }
+QStringList OverlayController::heldModifiers() const { return m_held; }
+bool OverlayController::keyboardMode() const { return m_keyboardMode; }
+
+void OverlayController::toggleKeyboard() {
+    if (m_keyboardMode) {
+        closeKeyboard();
+        return;
+    }
+    stopDelay();
+    m_keyboardMode = true;
+    emit keyboardModeChanged();
+    reload();
+    setPanelVisible(true);
+}
+
+void OverlayController::closeKeyboard() {
+    if (!m_keyboardMode) {
+        return;
+    }
+    m_keyboardMode = false;
+    emit keyboardModeChanged();
+    stopDelay();
+    setPanelVisible(false);
+    // Keep the held toggling shortcut from reopening the passive panel.
+    m_suppressed = true;
+}
+
 QVariantList OverlayController::continuations() const {
     return m_continuations;
 }
@@ -163,6 +204,10 @@ void OverlayController::stopDelay() {
 
 void OverlayController::onHeldChanged(const QStringList &held) {
     m_held = held;
+    if (m_keyboardMode) {
+        rebuild();
+        return;
+    }
 
     if (m_held.isEmpty()) {
         // Every modifier is up: the gesture is over in every case, so the
@@ -206,6 +251,9 @@ void OverlayController::onHeldChanged(const QStringList &held) {
 }
 
 void OverlayController::onShortcutTaken() {
+    if (m_keyboardMode) {
+        return;
+    }
     if (m_held.isEmpty()) {
         // A key pressed on its own is nothing this panel has to say anything
         // about.
@@ -218,7 +266,7 @@ void OverlayController::onShortcutTaken() {
 
 void OverlayController::onDelayElapsed() {
     // The timer is single shot, so the wait is over either way.
-    if (!answersHeld() || m_suppressed) {
+    if (m_keyboardMode || !answersHeld() || m_suppressed) {
         emit panelPendingChanged();
         return;
     }
