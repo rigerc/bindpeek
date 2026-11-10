@@ -126,6 +126,42 @@ The panel comes up with it. Hold a modifier, and the shortcuts that modifier
 fires appear. Add a second modifier and the list narrows to what the two of them
 fire together. Release, and it is gone.
 
+### Interactive keyboard map
+
+The original hold-to-show cheat sheet is still the default. To open a
+keyboard-shaped view instead, run:
+
+```sh
+bindpeek --toggle
+```
+
+The command opens the keyboard immediately, or toggles the keyboard off if
+Bindpeek is already running with it open. If the regular Bindpeek panel is
+running in the background, the command sends it a local request and exits
+immediately. If no panel is running, the command starts the overlay with the
+keyboard open.
+
+Hold **Super**, **Ctrl**, **Alt** or **Shift** to narrow the colored keys to
+bindings that include all held modifiers; release to return to the whole
+keyboard. Keys with exact matches have green outlines, those requiring an
+additional modifier have accent-colored outlines, and inactive keys are muted.
+Keycaps show descriptions; shortcuts for keys outside the illustrated layout
+appear in an overflow line below it. Press **Escape** or click the keyboard
+surface to close it.
+
+For a toggle hotkey in Hyprland:
+
+```ini
+bind = SUPER, K, exec, bindpeek --toggle
+```
+
+The keyboard intentionally requests exclusive focus while open so typing does
+not execute the shortcuts being explored. The original hold-to-show panel
+remains non-interactive and leaves shortcut execution untouched. For this
+reason, **Escape is always available to close the keyboard** even if the
+compositor does not forward a second global toggle shortcut.
+
+The `--toggle` command works alongside the existing editor/tray.
 The same list as text in the terminal:
 
 ```bash
