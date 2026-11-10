@@ -28,6 +28,8 @@
 #include <QLocale>
 #include <QLockFile>
 #include <QMargins>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QProcessEnvironment>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -86,6 +88,7 @@ constexpr char kOptionList[] = "list";
 constexpr char kOptionEnvironment[] = "environment";
 constexpr char kOptionSource[] = "source";
 constexpr char kOptionKeys[] = "keys";
+constexpr char kOptionToggle[] = "toggle";
 
 // The environments this program can read, in the order they are offered.
 //
@@ -115,6 +118,11 @@ const QStringList &knownEnvironments() {
 QString listDescription() {
     return QCoreApplication::translate(
         "main", "Print the shortcuts as text instead of showing the overlay.");
+}
+
+QString toggleDescription() {
+    return QCoreApplication::translate(
+        "main", "Toggle the keyboard map (start it if needed).");
 }
 
 QString keysDescription() {
@@ -167,6 +175,7 @@ struct ProgramOption {
 constexpr ProgramOption kOptions[] = {
     {kOptionList, nullptr, listDescription, true},
     {kOptionKeys, nullptr, keysDescription, true},
+    {kOptionToggle, nullptr, toggleDescription, false},
     {kOptionEnvironment, environmentValueName, environmentDescription, false},
     {kOptionSource, sourceValueName, sourceDescription, false},
 };
@@ -356,8 +365,20 @@ std::unique_ptr<QLockFile> claimSingleInstance(QTextStream &err) {
     return {};
 }
 
+// A connection to this session-local socket toggles the active keyboard map.
+QString toggleSocketPath() {
+    return AppInfo::lockPath() + QStringLiteral(".toggle");
+}
+
+bool sendToggle() {
+    QLocalSocket socket;
+    socket.connectToServer(toggleSocketPath());
+    return socket.waitForConnected(300);
+}
+
 // Shows the overlay and runs the event loop. Returns the process exit code.
-int runOverlay(std::unique_ptr<Source> source, QTextStream &err) {
+int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
+               bool openKeyboard) {
     // Before anything is created: on a session without wlr-layer-shell the
     // panel would come up as an ordinary window with a title bar, which looks
     // like a defect rather than an unsupported setup.
@@ -460,6 +481,46 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err) {
         // an item inside that window and is laid out there.
         applyPlacement(layerWindow, settings);
     }
+    // The single-instance lock means only this process can remove a stale
+    // socket left behind by a previous crash.
+    QLocalServer toggleServer;
+    const QString socketPath = toggleSocketPath();
+    QLocalServer::removeServer(socketPath);
+    if (!toggleServer.listen(socketPath)) {
+        err << QCoreApplication::translate("main", "Cannot listen on %1: %2")
+                   .arg(socketPath, toggleServer.errorString()) << '\n';
+        return 1;
+    }
+    QObject::connect(&toggleServer, &QLocalServer::newConnection,
+                     controller.get(), [&toggleServer, active = controller.get()]() {
+        while (QLocalSocket *client = toggleServer.nextPendingConnection()) {
+            client->disconnectFromServer();
+            client->deleteLater();
+            active->toggleKeyboard();
+        }
+    });
+
+    // The original panel is input-transparent. Only the explicit keyboard
+    // mode receives focus, and when it closes the original placement returns.
+    QObject::connect(controller.get(), &OverlayController::keyboardModeChanged,
+                     window, [window, active = controller.get()]() {
+        if (auto *layer = LayerShellQt::Window::get(window)) {
+            if (active->keyboardMode()) {
+                layer->setAnchors({});
+                layer->setMargins(QMargins());
+                layer->setKeyboardInteractivity(
+                    LayerShellQt::Window::KeyboardInteractivityExclusive);
+            } else {
+                applyPlacement(layer, Settings());
+                layer->setKeyboardInteractivity(
+                    LayerShellQt::Window::KeyboardInteractivityNone);
+            }
+        }
+    });
+    if (openKeyboard) {
+        controller->toggleKeyboard();
+    }
+
     // Watch the settings file so the editor's live saving reaches a running
     // panel. Everything that can change without a restart is applied here;
     // the file is re-added afterwards because an editor that replaces it
@@ -477,7 +538,9 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err) {
             appearance->apply(fresh);
 
             if (auto *layer = LayerShellQt::Window::get(window)) {
-                applyPlacement(layer, fresh);
+                if (!controller->keyboardMode()) {
+                    applyPlacement(layer, fresh);
+                }
                 // What was just set is double-buffered: the layer-shell
                 // protocol applies anchors and margins at the next commit of
                 // the surface, and Qt commits when it draws. A panel that is
@@ -571,6 +634,10 @@ int main(int argc, char **argv) {
     if (parser.isSet(QLatin1String(kOptionKeys))) {
         return runKeyWatch(out, err);
     }
+    const bool toggleRequested = parser.isSet(QLatin1String(kOptionToggle));
+    if (toggleRequested && sendToggle()) {
+        return 0;
+    }
 
     const QLatin1String environmentOption(kOptionEnvironment);
     const QString environment = parser.isSet(environmentOption)
@@ -619,7 +686,7 @@ int main(int argc, char **argv) {
     }
 
     if (!parser.isSet(QLatin1String(kOptionList))) {
-        return runOverlay(std::move(source), err);
+        return runOverlay(std::move(source), err, toggleRequested);
     }
 
     QString error;
