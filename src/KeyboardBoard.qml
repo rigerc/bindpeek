@@ -103,54 +103,28 @@ Item {
                         spacing: root.gap
                         Repeater {
                             model: modelData
-                            delegate: Rectangle {
+                            delegate: AnimatedKeycap {
                                 required property var modelData
                                 readonly property var info: modelData
-                                readonly property var active: root.forKey(info.code)
-                                readonly property bool heldKey: info.modifier !== ""
-                                            && root.held.indexOf(info.modifier) !== -1
-                                readonly property bool exact: active.some(
-                                            item => item.modifiers.length === root.held.length)
-                                readonly property bool blank: info.code === ""
+                                readonly property var matches: root.forKey(info.code)
+                                theme: root.theme
+                                caption: info.label
+                                detail: matches.length === 0 ? ""
+                                        : matches[0].description
+                                          + (matches.length > 1 ? " +" + (matches.length - 1) : "")
+                                available: matches.length > 0
+                                exact: matches.some(item => item.modifiers.length === root.held.length)
+                                heldModifier: info.modifier !== ""
+                                              && root.held.indexOf(info.modifier) !== -1
+                                blank: info.code === ""
+                                showDetail: root.showDescriptions
+                                centered: root.compact
+                                captionSize: Math.max(8, root.unit * (root.compact ? 0.34 : 0.25))
+                                detailSize: Math.max(8, root.unit * 0.17)
                                 width: root.unit * (info.units || 1)
                                        + root.gap * ((info.units || 1) - 1)
                                 height: root.unit
                                 radius: Math.max(3, root.unit * 0.12)
-                                color: blank ? "transparent"
-                                       : active.length || heldKey ? root.theme.surfaceHover
-                                       : root.theme.surface
-                                border.width: blank ? 0 : active.length || heldKey ? 2 : 1
-                                border.color: heldKey ? root.theme.accent
-                                            : exact ? root.theme.brand
-                                            : active.length ? root.theme.accent
-                                            : root.theme.border
-                                Column {
-                                    anchors.fill: parent
-                                    anchors.margins: Math.max(2, root.unit * 0.08)
-                                    spacing: Math.max(1, root.gap / 2)
-                                    visible: !blank
-                                    Text {
-                                        width: parent.width
-                                        text: info.label
-                                        elide: Text.ElideRight
-                                        horizontalAlignment: root.compact ? Text.AlignHCenter : Text.AlignLeft
-                                        color: heldKey ? root.theme.accent : root.theme.text
-                                        font.family: root.theme.fontFamilyMono
-                                        font.bold: active.length > 0
-                                        font.pixelSize: Math.max(8, root.unit * (root.compact ? 0.34 : 0.25))
-                                    }
-                                    Text {
-                                        width: parent.width
-                                        visible: root.showDescriptions
-                                        text: active.length === 0 ? ""
-                                              : active[0].description
-                                                + (active.length > 1 ? " +" + (active.length - 1) : "")
-                                        elide: Text.ElideRight
-                                        color: exact ? root.theme.brand : root.theme.textMuted
-                                        font.family: root.theme.fontFamily
-                                        font.pixelSize: Math.max(8, root.unit * 0.17)
-                                    }
-                                }
                             }
                         }
                     }
