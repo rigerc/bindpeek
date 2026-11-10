@@ -126,6 +126,24 @@ The panel comes up with it. Hold a modifier, and the shortcuts that modifier
 fires appear. Add a second modifier and the list narrows to what the two of them
 fire together. Release, and it is gone.
 
+### Keyviz-inspired keycap animations
+
+The keyboard, Quick Actions and Radial layouts now use animated keycap
+highlights: held modifiers glow, keys with reachable shortcuts have illuminated
+borders, and exact modifier matches receive stronger emphasis. The classic
+list's shortcut badges use the same palette-aware style. These transitions are
+visual only—Bindpeek still does not read ordinary key identities or execute
+the highlighted shortcuts.
+
+Under **Settings → Surface → Animate keycaps**, switch motion off whenever
+you prefer instant transitions. This setting is saved as
+`animationsEnabled=false` in `~/.config/bindpeek/bindpeek.conf` and is
+applied live, without restarting the overlay. The highlight colors remain
+visible when animations are disabled.
+
+Styling is inspired by [Keyviz](https://github.com/mulaRahul/keyviz), not a
+copy of its keystroke recorder or input-monitoring architecture.
+
 ### Interactive keyboard and action layouts
 
 Settings → **Behaviour → Overlay view** offers four layouts:
