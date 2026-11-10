@@ -26,7 +26,7 @@ visible before the file is written.
 | --- | --- | --- | --- |
 | `showDelayMs` | 0 to 5000 | `500` | How long a modifier has to be held before the panel appears. 0 shows it at once |
 | `overlayEnabled` | `true`, `false` | `true` | Whether the overlay process starts with the tray | 
-| `overlayView` | `list`, `keyboard` | `list` | `list` shows the classic panel on modifier hold; `keyboard` uses the toggle-to-open interactive keyboard and suppresses automatic list popups |
+| `overlayView` | `list`, `keyboard` | `list` | Which layout appears on modifier hold: the classic shortcut list or a keyboard map. Both use the existing delay and dismiss on release |
 | `position` | `center`, `left`, `right`, `top`, `bottom` | `bottom` | Where the panel sits. `center` floats in the middle |
 | `marginPx` | 0 to 400 | `14` | Distance to that edge. Ignored for `center` |
 | `edgeInsetPx` | 0 to 400 | `14` | How far a panel against an edge stops short of the two ends of it. 0 runs it corner to corner. Ignored for `center` |
@@ -45,12 +45,15 @@ visible before the file is written.
 | `opacity` | 0.0 to 1.0 | `0.90` | How solid the panel is |
 
 Select **Overlay view** under Behaviour in the settings window. Choosing
-`keyboard` changes the preview and suppresses the classic automatic list;
-open the keyboard with **Keyboard map → Open / close**, `bindpeek --toggle`,
-or a compositor hotkey such as `bind = SUPER, K, exec, bindpeek --toggle`.
-The keyboard still filters as modifiers are held, and Escape closes it.
-Choosing `list` restores the automatic modifier-held panel; the toggle command
-remains available in either view.
+`keyboard` shows the non-interactive keyboard picture when modifiers are held
+instead of the classic list. It filters as modifiers are held and disappears
+when they are released or a shortcut fires. Selecting `list` returns to the
+original panel. Both layouts use the configured show delay.
+
+The **Keyboard map → Open / close** button, `bindpeek --toggle`, and compositor
+hotkeys such as `bind = SUPER, K, exec, bindpeek --toggle` open an independent,
+focusable keyboard that stays visible without modifiers. Escape closes that
+toggled view. Explicit toggling works regardless of the selected default layout.
 
 `alignment` is named for the ends of an axis rather than for left and right,
 because which axis it applies to follows from the position: along the top or

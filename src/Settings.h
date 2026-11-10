@@ -84,8 +84,8 @@ public:
     // How long a modifier has to be held before the panel appears.
     int showDelayMs() const;
 
-    // Whether to show the classic list automatically or use the keyboard map
-    // opened by the separate --toggle command.
+    // Which picture the automatic modifier-held overlay draws: the classic
+    // list or the keyboard. The explicitly toggled keyboard is independent.
     QString overlayView() const;
 
     // How the shortcuts that need a further modifier are shown. One of

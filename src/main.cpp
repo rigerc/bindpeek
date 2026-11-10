@@ -365,6 +365,18 @@ std::unique_ptr<QLockFile> claimSingleInstance(QTextStream &err) {
     return {};
 }
 
+// The keyboard picture is a compact center-anchored surface, regardless of
+// where the classic list is configured. Using the same placement setup keeps
+// the active-output and exclusive-zone behavior consistent with list mode.
+void applyViewPlacement(LayerShellQt::Window *layer, const Settings &settings,
+                        bool drawKeyboard) {
+    applyPlacement(layer, settings);
+    if (drawKeyboard) {
+        layer->setAnchors({});
+        layer->setMargins(QMargins());
+    }
+}
+
 // A connection to this session-local socket toggles the active keyboard map.
 QString toggleSocketPath() {
     return AppInfo::lockPath() + QStringLiteral(".toggle");
@@ -424,7 +436,7 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
     controller->setShowsDeeper(settings.showsDeeper());
     controller->setIgnoreLoneShift(settings.ignoreLoneShift());
     controller->setArrangesByModifier(settings.arrangesByModifier());
-    controller->setKeyboardOnly(settings.overlayView() ==
+    controller->setKeyboardView(settings.overlayView() ==
                                 QLatin1String(overlayView::kKeyboard));
     if (!controller->reload()) {
         err << controller->message() << QChar(QLatin1Char(0x0A));
@@ -481,7 +493,7 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
         // Anchors and margins from the position setting. This is the only
         // surface a compositor places; the preview in the settings window is
         // an item inside that window and is laid out there.
-        applyPlacement(layerWindow, settings);
+        applyViewPlacement(layerWindow, settings, controller->keyboardView());
     }
     // The single-instance lock means only this process can remove a stale
     // socket left behind by a previous crash.
@@ -504,21 +516,19 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
         }
     });
 
-    // The original panel is input-transparent. Only the explicit keyboard
-    // mode receives focus, and when it closes the original placement returns.
+    // A passive keyboard should be no different from the list as far as
+    // shortcut execution and input transparency are concerned. Exclusive
+    // keyboard focus belongs only to the explicitly toggled map.
     QObject::connect(controller.get(), &OverlayController::keyboardModeChanged,
                      window, [window, active = controller.get()]() {
         if (auto *layer = LayerShellQt::Window::get(window)) {
-            if (active->keyboardMode()) {
-                layer->setAnchors({});
-                layer->setMargins(QMargins());
-                layer->setKeyboardInteractivity(
-                    LayerShellQt::Window::KeyboardInteractivityExclusive);
-            } else {
-                applyPlacement(layer, Settings());
-                layer->setKeyboardInteractivity(
-                    LayerShellQt::Window::KeyboardInteractivityNone);
-            }
+            applyViewPlacement(layer, Settings(),
+                               active->keyboardMode() || active->keyboardView());
+            layer->setKeyboardInteractivity(
+                active->keyboardMode()
+                    ? LayerShellQt::Window::KeyboardInteractivityExclusive
+                    : LayerShellQt::Window::KeyboardInteractivityNone);
+            window->requestUpdate();
         }
     });
     if (openKeyboard) {
@@ -539,14 +549,14 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
             controller->setShowsDeeper(fresh.showsDeeper());
             controller->setIgnoreLoneShift(fresh.ignoreLoneShift());
             controller->setArrangesByModifier(fresh.arrangesByModifier());
-            controller->setKeyboardOnly(fresh.overlayView() ==
+            controller->setKeyboardView(fresh.overlayView() ==
                                         QLatin1String(overlayView::kKeyboard));
             appearance->apply(fresh);
 
             if (auto *layer = LayerShellQt::Window::get(window)) {
-                if (!controller->keyboardMode()) {
-                    applyPlacement(layer, fresh);
-                }
+                applyViewPlacement(layer, fresh,
+                                   controller->keyboardMode() ||
+                                       controller->keyboardView());
                 // What was just set is double-buffered: the layer-shell
                 // protocol applies anchors and margins at the next commit of
                 // the surface, and Qt commits when it draws. A panel that is

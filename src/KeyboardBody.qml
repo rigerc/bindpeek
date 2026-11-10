@@ -23,6 +23,9 @@ Item {
     implicitHeight: content.implicitHeight + 2 * padding
     focus: interactive
     onVisibleChanged: if (visible && interactive) forceActiveFocus()
+    // Switching from passive keyboard to the explicitly toggled view does not
+    // change visibility, so the new interactive state must request focus too.
+    onInteractiveChanged: if (interactive && visible) forceActiveFocus()
     Keys.onPressed: event => {
         // When a compositor forwards the binding, Super+K toggles off too.
         if (interactive && (event.key === Qt.Key_Escape ||
