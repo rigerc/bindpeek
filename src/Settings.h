@@ -38,6 +38,12 @@ inline constexpr char kSource[] = "source";
 inline constexpr char kModifiers[] = "modifiers";
 } // namespace arrangement
 
+// The passive modifier-held list and the explicitly toggled keyboard map.
+namespace overlayView {
+inline constexpr char kList[] = "list";
+inline constexpr char kKeyboard[] = "keyboard";
+} // namespace overlayView
+
 // Where the panel's content sits along the edge it spans. One of these words;
 // knownAlignments() lists them in the order the editor offers them.
 //
@@ -77,6 +83,10 @@ public:
 
     // How long a modifier has to be held before the panel appears.
     int showDelayMs() const;
+
+    // Whether to show the classic list automatically or use the keyboard map
+    // opened by the separate --toggle command.
+    QString overlayView() const;
 
     // How the shortcuts that need a further modifier are shown. One of
     // knownDisclosures(); see the words there for what each does.
@@ -223,6 +233,7 @@ public:
     // --- Setters, used by the editor --------------------------------------
 
     void setShowDelayMs(int value);
+    void setOverlayView(const QString &value);
     void setPosition(Position value);
     void setMarginPx(int value);
     void setEdgeInsetPx(int value);
@@ -270,6 +281,7 @@ public:
     //              submap
     //   modifiers  a group per combination, nearest first
     static QStringList knownArrangements();
+    static QStringList knownOverlayViews();
 
     // The three places the content can sit along the spanned axis, in the
     // order the editor offers them: against the beginning of that axis, in
@@ -278,6 +290,7 @@ public:
 
 private:
     int m_showDelayMs;
+    QString m_overlayView;
     bool m_overlayEnabled;
     QString m_disclosure;
     QString m_arrangement;
