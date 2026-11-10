@@ -343,8 +343,8 @@ QStringList Settings::knownArrangements() {
 }
 
 QStringList Settings::knownOverlayViews() {
-    return {QLatin1String(overlayView::kList),
-            QLatin1String(overlayView::kKeyboard)};
+    return {QLatin1String(bindpeek::overlayView::kList),
+            QLatin1String(bindpeek::overlayView::kKeyboard)};
 }
 
 QStringList Settings::knownPositions() {
