@@ -21,7 +21,10 @@ Window {
     // with KeyboardInteractivityNone that makes the panel a pure bystander,
     // which is the whole point: the shortcut it shows has to keep working
     // while it is on screen.
-    flags: Qt.FramelessWindowHint | Qt.WindowTransparentForInput
+    // The original overlay passes through clicks. The explicit keyboard map
+    // instead accepts pointer and keyboard input until closed.
+    flags: Qt.FramelessWindowHint | (OverlayController.keyboardMode
+                                      ? 0 : Qt.WindowTransparentForInput)
     color: "transparent"
 
     // The surface goes up as soon as a combination is held, and the panel is
@@ -56,12 +59,14 @@ Window {
     // spanning an edge the compositor decides that extent, and a width of our
     // own would fight it.
     Binding on width {
-        when: !Appearance.spanHorizontal
-        value: panel.implicitWidth
+        when: OverlayController.keyboardMode || !Appearance.spanHorizontal
+        value: OverlayController.keyboardMode ? keyboard.implicitWidth
+                                               : panel.implicitWidth
     }
     Binding on height {
-        when: !Appearance.spanVertical
-        value: panel.implicitHeight
+        when: OverlayController.keyboardMode || !Appearance.spanVertical
+        value: OverlayController.keyboardMode ? keyboard.implicitHeight
+                                               : panel.implicitHeight
     }
 
     // The panel is measured against the output it is actually on. Under a
@@ -83,7 +88,8 @@ Window {
         // Drawn only when there is something worth looking at: the panel is
         // wanted, the surface is where it will stay, and the type has been
         // settled. Everything before that would be a stutter.
-        opacity: OverlayController.panelVisible && win.onItsOutput && panel.fitted ? 1 : 0
+        opacity: !OverlayController.keyboardMode && OverlayController.panelVisible
+                 && win.onItsOutput && panel.fitted ? 1 : 0
         // Told whether it is being read, which is what decides between
         // searching for a size out of sight and stepping towards one in
         // plain view.
@@ -117,6 +123,18 @@ Window {
         heldText: OverlayController.subtitle
         message: OverlayController.message
         groups: OverlayController.groups
+    }
+
+    // Full, reactive key map for explicitly toggled exploration. It takes
+    // focus only while open and reuses the current palette and font settings.
+    KeyboardBody {
+        id: keyboard
+        anchors.centerIn: parent
+        theme: theme
+        bindings: OverlayController.keyboardBinds
+        held: OverlayController.heldModifiers
+        visible: OverlayController.keyboardMode
+        opacity: win.onItsOutput ? 1 : 0
     }
 
     // The same panel again, off screen, against the same bound: it reads that
