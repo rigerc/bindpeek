@@ -103,6 +103,8 @@ Item {
                         color: exact ? root.theme.surfaceHover : root.theme.surface
                         border.width: exact ? 2 : 1
                         border.color: exact ? root.theme.accent : root.theme.border
+                        // The row frames use the palette accent, while
+                        // keyboard highlights still distinguish exact matches.
                         scale: exact ? 1.01 : 1
                         Behavior on scale {
                             enabled: root.theme.animationsEnabled

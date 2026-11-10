@@ -107,6 +107,14 @@ Item {
                 color: root.theme.surfaceHover
                 border.color: root.theme.accent
                 border.width: 3
+                scale: Math.min(1.08, 1 + root.held.length * 0.025)
+                Behavior on scale {
+                    enabled: root.theme.animationsEnabled
+                    NumberAnimation {
+                        duration: root.theme.cardAnimationDuration
+                        easing.type: Easing.OutCubic
+                    }
+                }
                 Text {
                     anchors.fill: parent
                     anchors.margins: 6
