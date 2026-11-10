@@ -34,6 +34,9 @@ class OverlayController : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString subtitle READ subtitle NOTIFY viewChanged)
     Q_PROPERTY(QVariantList groups READ groups NOTIFY viewChanged)
+    Q_PROPERTY(QVariantList keyboardBinds READ keyboardBinds NOTIFY viewChanged)
+    Q_PROPERTY(QStringList heldModifiers READ heldModifiers NOTIFY viewChanged)
+    Q_PROPERTY(bool keyboardMode READ keyboardMode NOTIFY keyboardModeChanged)
     // What each further modifier would still reach, for the footer.
     Q_PROPERTY(QVariantList continuations READ continuations NOTIFY viewChanged)
     Q_PROPERTY(QString message READ message NOTIFY viewChanged)
@@ -78,6 +81,11 @@ public:
 
     QString subtitle() const;
     QVariantList groups() const;
+    QVariantList keyboardBinds() const;
+    QStringList heldModifiers() const;
+    bool keyboardMode() const;
+    Q_INVOKABLE void toggleKeyboard();
+    Q_INVOKABLE void closeKeyboard();
     QVariantList continuations() const;
     QString message() const;
     bool isPanelVisible() const;
@@ -87,6 +95,7 @@ signals:
     void viewChanged();
     void panelVisibleChanged();
     void panelPendingChanged();
+    void keyboardModeChanged();
 
 private slots:
     void onHeldChanged(const QStringList &held);
@@ -113,6 +122,7 @@ private:
 
     QStringList m_held;
     QVariantList m_groups;
+    QVariantList m_keyboardBinds;
     QVariantList m_continuations;
 
     // Runs between the modifier going down and the panel appearing.
@@ -131,6 +141,7 @@ private:
     bool m_arrangesByModifier = false;
 
     bool m_panelVisible = false;
+    bool m_keyboardMode = false;
 };
 
 } // namespace bindpeek
