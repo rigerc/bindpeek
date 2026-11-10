@@ -117,7 +117,7 @@ private slots:
     void theSurfaceNeverGoesDownAtTheMomentItIsNeeded();
     void keyboardModeIgnoresAutomaticDismissal();
     void keyboardModeExposesAllBindings();
-    void keyboardOnlyRequiresExplicitToggle();
+    void keyboardViewAppearsOnModifierHold();
 };
 
 void TestOverlay::headingsAppearOnceEachAndInSourceOrder() {
@@ -458,28 +458,41 @@ void TestOverlay::keyboardModeExposesAllBindings() {
     QCOMPARE(controller.keyboardBinds().size(), 2);
 }
 
-void TestOverlay::keyboardOnlyRequiresExplicitToggle() {
+void TestOverlay::keyboardViewAppearsOnModifierHold() {
     WatchClient watch;
     auto source = std::make_unique<StubSource>(QList<Bind>{
         bind({QStringLiteral("SUPER")}, QStringLiteral("T"),
              QStringLiteral("Apps"))});
     OverlayController controller(std::move(source), &watch, kShowDelayMs);
     QVERIFY(controller.reload());
-    controller.setKeyboardOnly(true);
-    emit watch.heldChanged({QStringLiteral("SUPER")});
-    QTest::qWait(kShowDelayMs * kWaitFactor);
-    QVERIFY(!controller.isPanelVisible());
-    QVERIFY(!controller.isPanelPending());
+    controller.setKeyboardView(true);
+    QVERIFY(controller.keyboardView());
 
-    controller.toggleKeyboard();
-    QVERIFY(controller.isPanelVisible());
+    // A modifier summons the selected drawing after the original delay.
+    emit watch.heldChanged({QStringLiteral("SUPER")});
+    QTRY_VERIFY(controller.isPanelVisible());
+    QVERIFY(!controller.keyboardMode());
+    QCOMPARE(controller.heldModifiers(), QStringList({QStringLiteral("SUPER")}));
+
+    // Normal shortcuts dismiss the passive keyboard just like the old list.
     emit watch.shortcutTaken();
+    QVERIFY(!controller.isPanelVisible());
+    emit watch.heldChanged({});
+    emit watch.heldChanged({QStringLiteral("SUPER")});
+    QTRY_VERIFY(controller.isPanelVisible());
+
+    // The explicit toggle is still sticky and ignores modifier releases.
+    controller.toggleKeyboard();
+    QVERIFY(controller.keyboardMode());
+    emit watch.heldChanged({});
     QVERIFY(controller.isPanelVisible());
     controller.closeKeyboard();
+    QVERIFY(!controller.keyboardMode());
     QVERIFY(!controller.isPanelVisible());
 
-    emit watch.heldChanged({});
-    controller.setKeyboardOnly(false);
+    // Switching views must not cancel a pending or visible passive overlay.
+    controller.setKeyboardView(false);
+    QVERIFY(!controller.keyboardView());
     emit watch.heldChanged({QStringLiteral("SUPER")});
     QTRY_VERIFY(controller.isPanelVisible());
 }

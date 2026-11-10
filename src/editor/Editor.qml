@@ -755,8 +755,9 @@ Window {
                             }
                         }
 
-                        // Explicit keyboard mode can be opened without
-                        // configuring a compositor hotkey.
+                        // The keyboard view also appears on modifier hold;
+                        // this button opens its separate sticky, focusable mode
+                        // without requiring a compositor hotkey.
                         Row_ {
                             label: qsTr("Keyboard map")
                             Button_ {

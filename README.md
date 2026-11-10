@@ -128,10 +128,15 @@ fire together. Release, and it is gone.
 
 ### Interactive keyboard map
 
-Choose **Behaviour → Overlay view → keyboard** in Settings to make the
-keyboard your primary overlay. This disables the automatic modifier-held list;
-use the **Keyboard map → Open / close** button in Settings or a hotkey to
-explore shortcuts. Choosing `list` restores the original automatic panel.
+Choose **Behaviour → Overlay view → keyboard** in Settings to draw the
+keyboard instead of the list when you hold a modifier. It appears after the
+configured delay, updates as you add modifiers, and disappears on release or
+when you use a shortcut. This passive view does **not** capture keyboard input.
+Selecting `list` restores the original modifier-held shortcut list.
+
+You can also open the keyboard independently with **Keyboard map → Open /
+close** in Settings or a compositor hotkey. The explicitly toggled keyboard
+stays open, can receive input for Escape/Super+K, and is closed separately.
 
 The original hold-to-show cheat sheet is still the default. To open a
 keyboard-shaped view instead, run:

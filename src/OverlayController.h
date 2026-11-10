@@ -36,6 +36,10 @@ class OverlayController : public QObject {
     Q_PROPERTY(QVariantList groups READ groups NOTIFY viewChanged)
     Q_PROPERTY(QVariantList keyboardBinds READ keyboardBinds NOTIFY viewChanged)
     Q_PROPERTY(QStringList heldModifiers READ heldModifiers NOTIFY viewChanged)
+    // Select the drawing for the passive modifier-held overlay. Distinct from
+    // keyboardMode, which means the keyboard was explicitly toggled open and
+    // has focus.
+    Q_PROPERTY(bool keyboardView READ keyboardView NOTIFY keyboardViewChanged)
     Q_PROPERTY(bool keyboardMode READ keyboardMode NOTIFY keyboardModeChanged)
     // What each further modifier would still reach, for the footer.
     Q_PROPERTY(QVariantList continuations READ continuations NOTIFY viewChanged)
@@ -66,8 +70,9 @@ public:
     // Takes changed settings while running, so the editor live saving reaches
     // the panel without a restart.
     void setShowDelayMs(int value);
-    // Suppress passive shortcut-list popups in keyboard-only view.
-    void setKeyboardOnly(bool enabled);
+    // Select keyboard keycaps instead of the list for modifier-held popups.
+    // This does not change when the passive overlay appears.
+    void setKeyboardView(bool enabled);
 
     // Whether the panel answers with everything the held keys can still reach
     // or only with what fires this instant. See Settings::showsDeeper().
@@ -86,6 +91,7 @@ public:
     QVariantList keyboardBinds() const;
     QStringList heldModifiers() const;
     bool keyboardMode() const;
+    bool keyboardView() const;
     Q_INVOKABLE void toggleKeyboard();
     Q_INVOKABLE void closeKeyboard();
     QVariantList continuations() const;
@@ -98,6 +104,7 @@ signals:
     void panelVisibleChanged();
     void panelPendingChanged();
     void keyboardModeChanged();
+    void keyboardViewChanged();
 
 private slots:
     void onHeldChanged(const QStringList &held);
@@ -144,7 +151,7 @@ private:
 
     bool m_panelVisible = false;
     bool m_keyboardMode = false;
-    bool m_keyboardOnly = false;
+    bool m_keyboardView = false;
 };
 
 } // namespace bindpeek
