@@ -118,6 +118,7 @@ private slots:
     void keyboardModeIgnoresAutomaticDismissal();
     void keyboardModeExposesAllBindings();
     void keyboardViewAppearsOnModifierHold();
+    void alternateViewsKeepModifierHoldBehavior();
 };
 
 void TestOverlay::headingsAppearOnceEachAndInSourceOrder() {
@@ -495,6 +496,41 @@ void TestOverlay::keyboardViewAppearsOnModifierHold() {
     QVERIFY(!controller.keyboardView());
     emit watch.heldChanged({QStringLiteral("SUPER")});
     QTRY_VERIFY(controller.isPanelVisible());
+}
+
+void TestOverlay::alternateViewsKeepModifierHoldBehavior() {
+    WatchClient watch;
+    auto source = std::make_unique<StubSource>(QList<Bind>{
+        bind({QStringLiteral("SUPER")}, QStringLiteral("T"),
+             QStringLiteral("Terminal"))});
+    OverlayController controller(std::move(source), &watch, kShowDelayMs);
+    QVERIFY(controller.reload());
+
+    for (const QString &view : {QStringLiteral("quick-actions"),
+                                QStringLiteral("radial"),
+                                QStringLiteral("keyboard"),
+                                QStringLiteral("list")}) {
+        controller.setOverlayView(view);
+        QCOMPARE(controller.overlayView(), view);
+        QCOMPARE(controller.keyboardView(), view == QStringLiteral("keyboard"));
+        emit watch.heldChanged({});
+        emit watch.heldChanged({QStringLiteral("SUPER")});
+        QTRY_VERIFY(controller.isPanelVisible());
+        QVERIFY(!controller.keyboardMode());
+        controller.setOverlayView(QStringLiteral("list"));
+        // A view switch never dismisses an already visible passive surface.
+        QVERIFY(controller.isPanelVisible());
+        emit watch.shortcutTaken();
+        QVERIFY(!controller.isPanelVisible());
+    }
+
+    controller.setOverlayView(QStringLiteral("radial"));
+    controller.toggleKeyboard();
+    QVERIFY(controller.keyboardMode());
+    emit watch.heldChanged({});
+    QVERIFY(controller.isPanelVisible());
+    controller.closeKeyboard();
+    QVERIFY(!controller.isPanelVisible());
 }
 
 #include "test_overlay.moc"

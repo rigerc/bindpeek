@@ -111,14 +111,21 @@ void OverlayController::setShowDelayMs(int value) {
     m_delay.setInterval(value);
 }
 
-void OverlayController::setKeyboardView(bool enabled) {
-    if (m_keyboardView == enabled) {
+void OverlayController::setOverlayView(const QString &view) {
+    if (m_overlayView == view) {
         return;
     }
-    m_keyboardView = enabled;
-    // The view can be changed while a modifier is held, without interrupting
-    // the pending delay or hiding the already-visible surface.
-    emit keyboardViewChanged();
+    const bool wasKeyboard = keyboardView();
+    m_overlayView = view;
+    // A view switch redraws the same surface; it never changes the timer.
+    emit overlayViewChanged();
+    if (wasKeyboard != keyboardView()) {
+        emit keyboardViewChanged();
+    }
+}
+
+void OverlayController::setKeyboardView(bool enabled) {
+    setOverlayView(enabled ? QStringLiteral("keyboard") : QStringLiteral("list"));
 }
 
 void OverlayController::setShowsDeeper(bool value) {
@@ -161,7 +168,10 @@ QVariantList OverlayController::groups() const { return m_groups; }
 QVariantList OverlayController::keyboardBinds() const { return m_keyboardBinds; }
 QStringList OverlayController::heldModifiers() const { return m_held; }
 bool OverlayController::keyboardMode() const { return m_keyboardMode; }
-bool OverlayController::keyboardView() const { return m_keyboardView; }
+bool OverlayController::keyboardView() const {
+    return m_overlayView == QLatin1String("keyboard");
+}
+QString OverlayController::overlayView() const { return m_overlayView; }
 
 void OverlayController::toggleKeyboard() {
     if (m_keyboardMode) {

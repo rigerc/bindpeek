@@ -9,6 +9,10 @@
 set(BINDPEEK_OVERLAY_QML
   Overlay.qml
   KeyboardBody.qml
+  KeyboardBoard.qml
+  QuickActionsBody.qml
+  RadialActionsBody.qml
+  ShortcutPresentation.js
   FitProbe.qml
   EntryBlock.qml
   GroupCard.qml
@@ -26,6 +30,10 @@ set(BINDPEEK_EDITOR_QML
   editor/EditorTheme.qml
   editor/ThemedToolTip.qml
   KeyboardBody.qml
+  KeyboardBoard.qml
+  QuickActionsBody.qml
+  RadialActionsBody.qml
+  ShortcutPresentation.js
   EntryBlock.qml
   GroupCard.qml
   PanelBody.qml

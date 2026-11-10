@@ -747,7 +747,8 @@ Window {
                         Row_ {
                             label: qsTr("Overlay view")
                             Choice {
-                                model: SettingsModel.overlayViews
+                                model: [qsTr("List"), qsTr("Keyboard"),
+                                        qsTr("Quick Actions"), qsTr("Radial Menu")]
                                 currentIndex: SettingsModel.overlayViews.indexOf(SettingsModel.overlayView)
                                 onActivated: function (i) {
                                     SettingsModel.overlayView = SettingsModel.overlayViews[i];
@@ -1210,6 +1211,28 @@ Window {
                                  description: qsTr("Launcher"), group: "Programs",
                                  shortcut: "SUPER+SPACE"}
                             ]
+                            scale: Math.max(0.05, Math.min(1,
+                                       (previewBox.width - ui.paddingBox * 2) / implicitWidth,
+                                       (previewBox.height - ui.paddingBox * 2) / implicitHeight))
+                        }
+
+                        QuickActionsBody {
+                            visible: SettingsModel.overlayView === "quick-actions"
+                            anchors.centerIn: parent
+                            theme: preview
+                            bindings: keyboardPreview.bindings
+                            held: ["SUPER"]
+                            scale: Math.max(0.05, Math.min(1,
+                                       (previewBox.width - ui.paddingBox * 2) / implicitWidth,
+                                       (previewBox.height - ui.paddingBox * 2) / implicitHeight))
+                        }
+
+                        RadialActionsBody {
+                            visible: SettingsModel.overlayView === "radial"
+                            anchors.centerIn: parent
+                            theme: preview
+                            bindings: keyboardPreview.bindings
+                            held: ["SUPER"]
                             scale: Math.max(0.05, Math.min(1,
                                        (previewBox.width - ui.paddingBox * 2) / implicitWidth,
                                        (previewBox.height - ui.paddingBox * 2) / implicitHeight))

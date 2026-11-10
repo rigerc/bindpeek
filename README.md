@@ -126,7 +126,19 @@ The panel comes up with it. Hold a modifier, and the shortcuts that modifier
 fires appear. Add a second modifier and the list narrows to what the two of them
 fire together. Release, and it is gone.
 
-### Interactive keyboard map
+### Interactive keyboard and action layouts
+
+Settings → **Behaviour → Overlay view** offers four layouts:
+
+- `list`: original text-based shortcut list (default).
+- `keyboard`: full keyboard, with configured keys highlighted.
+- `quick-actions`: ordered shortcut cards above compact highlighted keycaps.
+- `radial`: five shortcut cards around the held-modifier indicator, with
+  remaining actions summarized and highlighted on the keyboard below.
+
+All four appear after the same hold delay, filter on modifiers, and dismiss
+when the modifiers are released or a shortcut is taken. The action cards
+reflect actual bindings; they never execute commands or intercept input.
 
 Choose **Behaviour → Overlay view → keyboard** in Settings to draw the
 keyboard instead of the list when you hold a modifier. It appears after the

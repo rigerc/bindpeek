@@ -344,7 +344,9 @@ QStringList Settings::knownArrangements() {
 
 QStringList Settings::knownOverlayViews() {
     return {QLatin1String(bindpeek::overlayView::kList),
-            QLatin1String(bindpeek::overlayView::kKeyboard)};
+            QLatin1String(bindpeek::overlayView::kKeyboard),
+            QLatin1String(bindpeek::overlayView::kQuickActions),
+            QLatin1String(bindpeek::overlayView::kRadial)};
 }
 
 QStringList Settings::knownPositions() {
@@ -677,8 +679,8 @@ bool Settings::writeTemplateIfMissing(const QString &path) {
         << kKeyOverlayEnabled << "="
         << (kOverlayEnabledDefault ? "true" : "false") << "\n"
         << "\n"
-        << "# Overlay view: list or keyboard, shown when modifiers are held.\n"
-        << "# The independent bindpeek --toggle keyboard is always available.\n"
+        << "# Overlay view on modifier hold: list, keyboard, quick-actions,\n"
+        << "# or radial. The bindpeek --toggle keyboard is independent.\n"
         << kKeyOverlayView << "=" << kOverlayViewDefault << "\n"
         << "\n"
         << "# Where the panel sits: "
