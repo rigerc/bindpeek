@@ -8,6 +8,7 @@
 # here every qsTr() in the interface is invisible to it.
 set(BINDPEEK_OVERLAY_QML
   Overlay.qml
+  KeyboardBody.qml
   FitProbe.qml
   EntryBlock.qml
   GroupCard.qml
@@ -85,6 +86,7 @@ target_link_libraries(bindpeek PRIVATE
   Qt6::Gui
   Qt6::Qml
   Qt6::Quick
+  Qt6::Network # --toggle uses a session-local QLocalServer/QLocalSocket
   # The desktop portal is asked over D-Bus for the light/dark setting.
   Qt6::DBus
   # Turns the window into a wlr-layer-shell surface. That is what puts the
