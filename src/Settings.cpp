@@ -20,6 +20,7 @@ namespace {
 // drift apart.
 constexpr char kKeyShowDelay[] = "showDelayMs";
 constexpr char kKeyOverlayEnabled[] = "overlayEnabled";
+constexpr char kKeyOverlayView[] = "overlayView";
 constexpr char kKeyDisclosure[] = "disclosure";
 constexpr char kKeyArrangement[] = "arrangement";
 constexpr char kKeyAlignment[] = "alignment";
@@ -97,6 +98,7 @@ constexpr char kThemeDarkDefault[] = "bindpeek";
 // Settings.h, where everything that acts on them can reach them.
 constexpr const char *kDisclosureDefault = disclosure::kSections;
 constexpr const char *kArrangementDefault = arrangement::kSource;
+constexpr const char *kOverlayViewDefault = overlayView::kList;
 
 // Where the content sits along the axis the panel spans: in the middle of it.
 // The panel is looked at rather than read line by line, and the middle is
@@ -340,6 +342,11 @@ QStringList Settings::knownArrangements() {
             QLatin1String(arrangement::kModifiers)};
 }
 
+QStringList Settings::knownOverlayViews() {
+    return {QLatin1String(overlayView::kList),
+            QLatin1String(overlayView::kKeyboard)};
+}
+
 QStringList Settings::knownPositions() {
     return {QLatin1String(kPositionCenter), QLatin1String(kPositionLeft),
             QLatin1String(kPositionRight), QLatin1String(kPositionTop),
@@ -407,6 +414,7 @@ QString Settings::defaultPath() {
 //   fontFamily=<anything>   | taken as written, resolved when rendering
 Settings::Settings(QString path)
     : m_showDelayMs(kShowDelayDefault),
+      m_overlayView(QLatin1String(kOverlayViewDefault)),
       m_overlayEnabled(kOverlayEnabledDefault),
       m_disclosure(QLatin1String(kDisclosureDefault)),
       m_arrangement(QLatin1String(kArrangementDefault)),
@@ -443,6 +451,9 @@ Settings::Settings(QString path)
     m_edgeInsetPx =
         read.integer(kKeyEdgeInset, kEdgeInsetDefault, kMarginMin, kMarginMax);
     m_overlayEnabled = read.boolean(kKeyOverlayEnabled, kOverlayEnabledDefault);
+    m_overlayView = read.word(kKeyOverlayView,
+                              QLatin1String(kOverlayViewDefault),
+                              knownOverlayViews());
 
     m_disclosure = read.word(kKeyDisclosure, QLatin1String(kDisclosureDefault),
                              knownDisclosures());
@@ -465,6 +476,7 @@ Settings::Settings(QString path)
 }
 
 int Settings::showDelayMs() const { return m_showDelayMs; }
+QString Settings::overlayView() const { return m_overlayView; }
 Settings::Position Settings::position() const { return m_position; }
 int Settings::marginPx() const { return m_marginPx; }
 int Settings::edgeInsetPx() const { return m_edgeInsetPx; }
@@ -514,6 +526,7 @@ double Settings::opacity() const { return m_opacity; }
 QStringList Settings::warnings() const { return m_warnings; }
 
 void Settings::setShowDelayMs(int value) { m_showDelayMs = value; }
+void Settings::setOverlayView(const QString &value) { m_overlayView = value; }
 void Settings::setPosition(Position value) { m_position = value; }
 void Settings::setMarginPx(int value) { m_marginPx = value; }
 void Settings::setEdgeInsetPx(int value) { m_edgeInsetPx = value; }
@@ -559,6 +572,7 @@ bool Settings::save(const QString &path) const {
         {QLatin1String(kKeyEdgeInset), QString::number(m_edgeInsetPx)},
         {QLatin1String(kKeyOverlayEnabled),
          m_overlayEnabled ? QStringLiteral("true") : QStringLiteral("false")},
+        {QLatin1String(kKeyOverlayView), m_overlayView},
         {QLatin1String(kKeyDisclosure), m_disclosure},
         {QLatin1String(kKeyArrangement), m_arrangement},
         {QLatin1String(kKeyAlignment), m_alignment},
@@ -662,6 +676,10 @@ bool Settings::writeTemplateIfMissing(const QString &path) {
         << "# logout.\n"
         << kKeyOverlayEnabled << "="
         << (kOverlayEnabledDefault ? "true" : "false") << "\n"
+        << "\n"
+        << "# Overlay view: list (automatic modifier-held list) or keyboard\n"
+        << "# (toggleable keyboard map opened with bindpeek --toggle).\n"
+        << kKeyOverlayView << "=" << kOverlayViewDefault << "\n"
         << "\n"
         << "# Where the panel sits: "
         << knownPositions().join(QStringLiteral(", ")) << ".\n"
