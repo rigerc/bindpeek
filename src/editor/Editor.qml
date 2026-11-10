@@ -745,6 +745,28 @@ Window {
                         }
 
                         Row_ {
+                            label: qsTr("Overlay view")
+                            Choice {
+                                model: SettingsModel.overlayViews
+                                currentIndex: SettingsModel.overlayViews.indexOf(SettingsModel.overlayView)
+                                onActivated: function (i) {
+                                    SettingsModel.overlayView = SettingsModel.overlayViews[i];
+                                }
+                            }
+                        }
+
+                        // Explicit keyboard mode can be opened without
+                        // configuring a compositor hotkey.
+                        Row_ {
+                            label: qsTr("Keyboard map")
+                            Button_ {
+                                text: qsTr("Open / close")
+                                enabled: OverlayControl.supported
+                                onClicked: OverlayControl.toggleKeyboardMap(SettingsModel)
+                            }
+                        }
+
+                        Row_ {
                             label: qsTr("Delay")
                             ValueSlider {
                                 from: SettingsModel.showDelayMin
@@ -1045,6 +1067,7 @@ Window {
                         // preview stays inside the window while the real panel is
                         // measured against the display.
                         PanelBody {
+                            visible: SettingsModel.overlayView === "list"
                             anchors.centerIn: parent
                             theme: preview
                             groupsAcross: preview.groupsAcross
@@ -1155,6 +1178,40 @@ Window {
                             }).filter(function (group) {
                                 return group.entries.length > 0;
                             }))
+                        }
+
+                        // The real keyboard renderer, scaled to this preview
+                        // and made non-interactive so it cannot steal focus.
+                        KeyboardBody {
+                            id: keyboardPreview
+                            visible: SettingsModel.overlayView === "keyboard"
+                            interactive: false
+                            anchors.centerIn: parent
+                            theme: preview
+                            held: ["SUPER"]
+                            bindings: [
+                                {key: "T", modifiers: ["SUPER"],
+                                 description: qsTr("Terminal"), group: "Programs",
+                                 shortcut: "SUPER+T"},
+                                {key: "B", modifiers: ["SUPER"],
+                                 description: qsTr("Browser"), group: "Programs",
+                                 shortcut: "SUPER+B"},
+                                {key: "H", modifiers: ["SUPER"],
+                                 description: qsTr("Focus left"), group: "Windows",
+                                 shortcut: "SUPER+H"},
+                                {key: "T", modifiers: ["SUPER", "SHIFT"],
+                                 description: qsTr("New terminal"), group: "Programs",
+                                 shortcut: "SUPER+SHIFT+T"},
+                                {key: "C", modifiers: ["SUPER", "CTRL"],
+                                 description: qsTr("Close window"), group: "Windows",
+                                 shortcut: "SUPER+CTRL+C"},
+                                {key: "SPACE", modifiers: ["SUPER"],
+                                 description: qsTr("Launcher"), group: "Programs",
+                                 shortcut: "SUPER+SPACE"}
+                            ]
+                            scale: Math.max(0.05, Math.min(1,
+                                       (previewBox.width - ui.paddingBox * 2) / implicitWidth,
+                                       (previewBox.height - ui.paddingBox * 2) / implicitHeight))
                         }
                     }
 
