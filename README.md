@@ -128,6 +128,11 @@ fire together. Release, and it is gone.
 
 ### Interactive keyboard map
 
+Choose **Behaviour → Overlay view → keyboard** in Settings to make the
+keyboard your primary overlay. This disables the automatic modifier-held list;
+use the **Keyboard map → Open / close** button in Settings or a hotkey to
+explore shortcuts. Choosing `list` restores the original automatic panel.
+
 The original hold-to-show cheat sheet is still the default. To open a
 keyboard-shaped view instead, run:
 
