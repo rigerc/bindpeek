@@ -424,6 +424,8 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
     controller->setShowsDeeper(settings.showsDeeper());
     controller->setIgnoreLoneShift(settings.ignoreLoneShift());
     controller->setArrangesByModifier(settings.arrangesByModifier());
+    controller->setKeyboardOnly(settings.overlayView() ==
+                                QLatin1String(overlayView::kKeyboard));
     if (!controller->reload()) {
         err << controller->message() << QChar(QLatin1Char(0x0A));
         return 1;
@@ -537,6 +539,8 @@ int runOverlay(std::unique_ptr<Source> source, QTextStream &err,
             controller->setShowsDeeper(fresh.showsDeeper());
             controller->setIgnoreLoneShift(fresh.ignoreLoneShift());
             controller->setArrangesByModifier(fresh.arrangesByModifier());
+            controller->setKeyboardOnly(fresh.overlayView() ==
+                                        QLatin1String(overlayView::kKeyboard));
             appearance->apply(fresh);
 
             if (auto *layer = LayerShellQt::Window::get(window)) {
