@@ -49,6 +49,7 @@ private slots:
     void saveKeepsComments();
     void saveRoundTripsEveryValue();
     void saveAppendsMissingKeys();
+    void overlayViewValidation();
 };
 
 void TestSettings::missingFileUsesDefault() {
@@ -183,6 +184,7 @@ void TestSettings::saveRoundTripsEveryValue() {
     written.setMarginPx(40);
     written.setEdgeInsetPx(12);
     written.setOverlayEnabled(false);
+    written.setOverlayView(QStringLiteral("keyboard"));
     written.setDisclosure(QStringLiteral("sections"));
     written.setArrangement(QStringLiteral("modifiers"));
     written.setAlignment(QStringLiteral("end"));
@@ -211,6 +213,7 @@ void TestSettings::saveRoundTripsEveryValue() {
     QCOMPARE(read.marginPx(), 40);
     QCOMPARE(read.edgeInsetPx(), 12);
     QCOMPARE(read.overlayEnabled(), false);
+    QCOMPARE(read.overlayView(), QStringLiteral("keyboard"));
     QCOMPARE(read.disclosure(), QStringLiteral("sections"));
     QCOMPARE(read.arrangement(), QStringLiteral("modifiers"));
     // Asked as the panel asks it, for the reason given at the alignment below.
@@ -255,5 +258,26 @@ void TestSettings::saveAppendsMissingKeys() {
     QVERIFY(QString::fromUtf8(file.readAll())
                 .contains(QStringLiteral("# my notes")));
 }
+void TestSettings::overlayViewValidation() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const Settings defaults(dir.filePath(QStringLiteral("absent.conf")));
+    QCOMPARE(defaults.overlayView(), QStringLiteral("list"));
+    QCOMPARE(Settings::knownOverlayViews(),
+             QStringList({QStringLiteral("list"), QStringLiteral("keyboard")}));
+
+    const QString selected = writeFile(dir, QStringLiteral("overlayView=keyboard\n"));
+    QVERIFY(!selected.isEmpty());
+    const Settings selectedSettings(selected);
+    QCOMPARE(selectedSettings.overlayView(), QStringLiteral("keyboard"));
+    QVERIFY(selectedSettings.warnings().isEmpty());
+
+    const QString invalid = writeFile(dir, QStringLiteral("overlayView=unknown\n"));
+    QVERIFY(!invalid.isEmpty());
+    const Settings fallback(invalid);
+    QCOMPARE(fallback.overlayView(), QStringLiteral("list"));
+    QVERIFY(!fallback.warnings().isEmpty());
+}
+
 QTEST_APPLESS_MAIN(TestSettings)
 #include "test_settings.moc"

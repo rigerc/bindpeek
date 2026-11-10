@@ -129,6 +129,27 @@ void OverlayProcess::requestToggle(SettingsModel *model) {
     toggle();
 }
 
+void OverlayProcess::toggleKeyboardMap(SettingsModel *model) {
+    if (!m_compositor.supported) {
+        setNotice(m_compositor.message());
+        return;
+    }
+
+    // The overlay's --toggle command uses session-local IPC when already up,
+    // or starts the overlay with the keyboard open. No second control protocol
+    // is needed here.
+    const bool alreadyRunning = lockedOverlayPid() != 0;
+    if (!QProcess::startDetached(overlayBinary(),
+                                 {QStringLiteral("--toggle")})) {
+        setNotice(tr("Unable to launch the keyboard overlay."));
+        return;
+    }
+    if (!alreadyRunning && model != nullptr) {
+        model->setOverlayEnabled(true);
+    }
+    QTimer::singleShot(kSettleMs, this, &OverlayProcess::refresh);
+}
+
 QString OverlayProcess::unsupportedReason() const {
     return m_compositor.message();
 }

@@ -78,6 +78,10 @@ public:
     // the other.
     Q_INVOKABLE void requestToggle(SettingsModel *model);
 
+    // Open/close the keyboard map via the same command the compositor hotkey
+    // uses. Starts the background overlay when none is running.
+    Q_INVOKABLE void toggleKeyboardMap(SettingsModel *model);
+
     // Asks every running overlay to quit, politely: SIGTERM, so it can release
     // its layer surface instead of leaving one behind.
     Q_INVOKABLE void stop();

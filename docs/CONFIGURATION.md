@@ -25,7 +25,8 @@ visible before the file is written.
 | Key | Values | Default | What it does |
 | --- | --- | --- | --- |
 | `showDelayMs` | 0 to 5000 | `500` | How long a modifier has to be held before the panel appears. 0 shows it at once |
-| `overlayEnabled` | `true`, `false` | `true` | Whether the panel is wanted at all. The tray writes this line, so the answer survives a logout |
+| `overlayEnabled` | `true`, `false` | `true` | Whether the overlay process starts with the tray | 
+| `overlayView` | `list`, `keyboard` | `list` | `list` shows the classic panel on modifier hold; `keyboard` uses the toggle-to-open interactive keyboard and suppresses automatic list popups |
 | `position` | `center`, `left`, `right`, `top`, `bottom` | `bottom` | Where the panel sits. `center` floats in the middle |
 | `marginPx` | 0 to 400 | `14` | Distance to that edge. Ignored for `center` |
 | `edgeInsetPx` | 0 to 400 | `14` | How far a panel against an edge stops short of the two ends of it. 0 runs it corner to corner. Ignored for `center` |
@@ -42,6 +43,14 @@ visible before the file is written.
 | `cornerRadiusPx` | 0 to 64 | `14` | The rounding of the panel |
 | `borderWidthPx` | 0 to 16 | `1` | The frame of the panel |
 | `opacity` | 0.0 to 1.0 | `0.90` | How solid the panel is |
+
+Select **Overlay view** under Behaviour in the settings window. Choosing
+`keyboard` changes the preview and suppresses the classic automatic list;
+open the keyboard with **Keyboard map → Open / close**, `bindpeek --toggle`,
+or a compositor hotkey such as `bind = SUPER, K, exec, bindpeek --toggle`.
+The keyboard still filters as modifiers are held, and Escape closes it.
+Choosing `list` restores the automatic modifier-held panel; the toggle command
+remains available in either view.
 
 `alignment` is named for the ends of an axis rather than for left and right,
 because which axis it applies to follows from the position: along the top or

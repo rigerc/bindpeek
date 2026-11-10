@@ -25,6 +25,7 @@ set(BINDPEEK_EDITOR_QML
   editor/ConfirmDialog.qml
   editor/EditorTheme.qml
   editor/ThemedToolTip.qml
+  KeyboardBody.qml
   EntryBlock.qml
   GroupCard.qml
   PanelBody.qml

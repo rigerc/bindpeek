@@ -133,6 +133,7 @@ Window {
         theme: theme
         bindings: OverlayController.keyboardBinds
         held: OverlayController.heldModifiers
+        onCloseRequested: OverlayController.closeKeyboard()
         visible: OverlayController.keyboardMode
         opacity: win.onItsOutput ? 1 : 0
     }

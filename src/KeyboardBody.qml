@@ -10,6 +10,10 @@ Item {
     required property QtObject theme
     property var bindings: []
     property var held: []
+    // Also used in the editor's static preview: it must not steal focus or
+    // close a real overlay when somebody clicks the preview.
+    property bool interactive: true
+    signal closeRequested()
     readonly property int gap: Math.max(3, Math.round(unit * 0.09))
     readonly property int unit: Math.floor(Math.max(28, Math.min(58,
                            (theme.screenWidth - 80) / 24,
@@ -17,13 +21,13 @@ Item {
     readonly property int padding: Math.round(unit * 0.34)
     implicitWidth: content.implicitWidth + 2 * padding
     implicitHeight: content.implicitHeight + 2 * padding
-    focus: true
-    onVisibleChanged: if (visible) forceActiveFocus()
+    focus: interactive
+    onVisibleChanged: if (visible && interactive) forceActiveFocus()
     Keys.onPressed: event => {
         // When a compositor forwards the binding, Super+K toggles off too.
-        if (event.key === Qt.Key_Escape ||
-                (event.key === Qt.Key_K && (event.modifiers & Qt.MetaModifier))) {
-            OverlayController.closeKeyboard()
+        if (interactive && (event.key === Qt.Key_Escape ||
+                (event.key === Qt.Key_K && (event.modifiers & Qt.MetaModifier)))) {
+            closeRequested()
             event.accepted = true
         }
     }
@@ -266,6 +270,7 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: OverlayController.closeKeyboard()
+        enabled: root.interactive
+        onClicked: root.closeRequested()
     }
 }
