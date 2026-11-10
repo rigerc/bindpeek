@@ -115,6 +115,8 @@ private slots:
     void aLoneShiftIsNotAQuestion();
     void releasingEveryModifierEmptiesTheView();
     void theSurfaceNeverGoesDownAtTheMomentItIsNeeded();
+    void keyboardModeIgnoresAutomaticDismissal();
+    void keyboardModeExposesAllBindings();
 };
 
 void TestOverlay::headingsAppearOnceEachAndInSourceOrder() {
@@ -412,4 +414,47 @@ void TestOverlay::releasingEveryModifierEmptiesTheView() {
 // GUILESS rather than APPLESS: the controller owns timers, and a QTimer wants
 // an application to belong to even when nothing waits for it to fire.
 QTEST_GUILESS_MAIN(TestOverlay)
+
+void TestOverlay::keyboardModeIgnoresAutomaticDismissal() {
+    WatchClient watch;
+    auto source = std::make_unique<StubSource>(QList<Bind>{
+        bind({QStringLiteral("SUPER")}, QStringLiteral("T"),
+             QStringLiteral("Apps"))
+    });
+    OverlayController controller(std::move(source), &watch, kShowDelayMs);
+    QVERIFY(controller.reload());
+    controller.toggleKeyboard();
+    QVERIFY(controller.keyboardMode());
+    QVERIFY(controller.isPanelVisible());
+    emit watch.heldChanged({QStringLiteral("SUPER")});
+    QCOMPARE(controller.heldModifiers(), QStringList({QStringLiteral("SUPER")}));
+    emit watch.shortcutTaken();
+    QVERIFY(controller.isPanelVisible());
+    emit watch.heldChanged({});
+    QVERIFY(controller.isPanelVisible());
+    controller.toggleKeyboard();
+    QVERIFY(!controller.keyboardMode());
+    QVERIFY(!controller.isPanelVisible());
+}
+
+void TestOverlay::keyboardModeExposesAllBindings() {
+    WatchClient watch;
+    auto source = std::make_unique<StubSource>(QList<Bind>{
+        bind({QStringLiteral("SUPER")}, QStringLiteral("A"),
+             QStringLiteral("Apps")),
+        bind({QStringLiteral("CTRL")}, QStringLiteral("B"),
+             QStringLiteral("Editing"))
+    });
+    OverlayController controller(std::move(source), &watch, kShowDelayMs);
+    QVERIFY(controller.reload());
+    QCOMPARE(controller.keyboardBinds().size(), 2);
+    const QVariantMap first = controller.keyboardBinds().at(0).toMap();
+    QCOMPARE(first.value(QStringLiteral("key")).toString(), QStringLiteral("A"));
+    QCOMPARE(first.value(QStringLiteral("modifiers")).toStringList(),
+             QStringList({QStringLiteral("SUPER")}));
+    QCOMPARE(first.value(QStringLiteral("group")).toString(), QStringLiteral("Apps"));
+    emit watch.heldChanged({QStringLiteral("SUPER")});
+    QCOMPARE(controller.keyboardBinds().size(), 2);
+}
+
 #include "test_overlay.moc"
