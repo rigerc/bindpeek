@@ -42,6 +42,8 @@ inline constexpr char kModifiers[] = "modifiers";
 namespace overlayView {
 inline constexpr char kList[] = "list";
 inline constexpr char kKeyboard[] = "keyboard";
+inline constexpr char kQuickActions[] = "quick-actions";
+inline constexpr char kRadial[] = "radial";
 } // namespace overlayView
 
 // Where the panel's content sits along the edge it spans. One of these words;
@@ -84,8 +86,8 @@ public:
     // How long a modifier has to be held before the panel appears.
     int showDelayMs() const;
 
-    // Which picture the automatic modifier-held overlay draws: the classic
-    // list or the keyboard. The explicitly toggled keyboard is independent.
+    // Which layout the automatic modifier-held overlay draws: the original
+    // list, keyboard, quick actions or radial. The toggle stays independent.
     QString overlayView() const;
 
     // How the shortcuts that need a further modifier are shown. One of

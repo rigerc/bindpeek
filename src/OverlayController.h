@@ -39,6 +39,7 @@ class OverlayController : public QObject {
     // Select the drawing for the passive modifier-held overlay. Distinct from
     // keyboardMode, which means the keyboard was explicitly toggled open and
     // has focus.
+    Q_PROPERTY(QString overlayView READ overlayView NOTIFY overlayViewChanged)
     Q_PROPERTY(bool keyboardView READ keyboardView NOTIFY keyboardViewChanged)
     Q_PROPERTY(bool keyboardMode READ keyboardMode NOTIFY keyboardModeChanged)
     // What each further modifier would still reach, for the footer.
@@ -70,8 +71,9 @@ public:
     // Takes changed settings while running, so the editor live saving reaches
     // the panel without a restart.
     void setShowDelayMs(int value);
-    // Select keyboard keycaps instead of the list for modifier-held popups.
-    // This does not change when the passive overlay appears.
+    // Select the passive layout, keeping timing and dismissal unchanged.
+    // The bool setter remains for existing controller callers.
+    void setOverlayView(const QString &view);
     void setKeyboardView(bool enabled);
 
     // Whether the panel answers with everything the held keys can still reach
@@ -92,6 +94,7 @@ public:
     QStringList heldModifiers() const;
     bool keyboardMode() const;
     bool keyboardView() const;
+    QString overlayView() const;
     Q_INVOKABLE void toggleKeyboard();
     Q_INVOKABLE void closeKeyboard();
     QVariantList continuations() const;
@@ -105,6 +108,7 @@ signals:
     void panelPendingChanged();
     void keyboardModeChanged();
     void keyboardViewChanged();
+    void overlayViewChanged();
 
 private slots:
     void onHeldChanged(const QStringList &held);
@@ -151,7 +155,7 @@ private:
 
     bool m_panelVisible = false;
     bool m_keyboardMode = false;
-    bool m_keyboardView = false;
+    QString m_overlayView = QStringLiteral("list");
 };
 
 } // namespace bindpeek
