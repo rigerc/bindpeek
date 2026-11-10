@@ -244,6 +244,11 @@ QtObject {
     // the content never washes out over a bright window underneath.
     readonly property real panelOpacity: Appearance.opacity
 
+    // Shared motion tokens, with instant state changes when motion is disabled.
+    readonly property bool animationsEnabled: Appearance.animationsEnabled
+    readonly property int keyAnimationDuration: animationsEnabled ? 150 : 0
+    readonly property int cardAnimationDuration: animationsEnabled ? 180 : 0
+
     // --- Typography -------------------------------------------------------
 
     // Resolve to the first installed candidate instead of hard coding one.

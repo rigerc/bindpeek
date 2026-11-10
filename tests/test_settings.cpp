@@ -50,6 +50,7 @@ private slots:
     void saveRoundTripsEveryValue();
     void saveAppendsMissingKeys();
     void overlayViewValidation();
+    void animationsEnabledValidation();
 };
 
 void TestSettings::missingFileUsesDefault() {
@@ -59,6 +60,7 @@ void TestSettings::missingFileUsesDefault() {
     const Settings settings(
         dir.filePath(QStringLiteral("does-not-exist.conf")));
     QCOMPARE(settings.showDelayMs(), kExpectedDefault);
+    QCOMPARE(settings.animationsEnabled(), true);
     // A missing file is the normal case, not something to complain about.
     QVERIFY(settings.warnings().isEmpty());
 }
@@ -185,6 +187,7 @@ void TestSettings::saveRoundTripsEveryValue() {
     written.setEdgeInsetPx(12);
     written.setOverlayEnabled(false);
     written.setOverlayView(QStringLiteral("keyboard"));
+    written.setAnimationsEnabled(false);
     written.setDisclosure(QStringLiteral("sections"));
     written.setArrangement(QStringLiteral("modifiers"));
     written.setAlignment(QStringLiteral("end"));
@@ -214,6 +217,7 @@ void TestSettings::saveRoundTripsEveryValue() {
     QCOMPARE(read.edgeInsetPx(), 12);
     QCOMPARE(read.overlayEnabled(), false);
     QCOMPARE(read.overlayView(), QStringLiteral("keyboard"));
+    QCOMPARE(read.animationsEnabled(), false);
     QCOMPARE(read.disclosure(), QStringLiteral("sections"));
     QCOMPARE(read.arrangement(), QStringLiteral("modifiers"));
     // Asked as the panel asks it, for the reason given at the alignment below.
@@ -285,6 +289,22 @@ void TestSettings::overlayViewValidation() {
     QVERIFY(!invalid.isEmpty());
     const Settings fallback(invalid);
     QCOMPARE(fallback.overlayView(), QStringLiteral("list"));
+    QVERIFY(!fallback.warnings().isEmpty());
+}
+
+void TestSettings::animationsEnabledValidation() {
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString disabled = writeFile(dir, QStringLiteral("animationsEnabled=false\n"));
+    QVERIFY(!disabled.isEmpty());
+    QCOMPARE(Settings(disabled).animationsEnabled(), false);
+    const QString enabled = writeFile(dir, QStringLiteral("animationsEnabled=yes\n"));
+    QVERIFY(!enabled.isEmpty());
+    QCOMPARE(Settings(enabled).animationsEnabled(), true);
+    const QString invalid = writeFile(dir, QStringLiteral("animationsEnabled=maybe\n"));
+    QVERIFY(!invalid.isEmpty());
+    const Settings fallback(invalid);
+    QCOMPARE(fallback.animationsEnabled(), true);
     QVERIFY(!fallback.warnings().isEmpty());
 }
 

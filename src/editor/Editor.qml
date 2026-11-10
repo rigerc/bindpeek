@@ -1014,6 +1014,14 @@ Window {
                             }
                         }
 
+                        Row_ {
+                            label: qsTr("Animate keycaps")
+                            Toggle {
+                                checked: SettingsModel.animationsEnabled
+                                onToggled: SettingsModel.animationsEnabled = checked
+                            }
+                        }
+
                         // The way back, at the end of the values it undoes and
                         // set apart from them by a rule: it is not a setting
                         // but an act on all of them at once.

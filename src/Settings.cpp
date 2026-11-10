@@ -21,6 +21,7 @@ namespace {
 constexpr char kKeyShowDelay[] = "showDelayMs";
 constexpr char kKeyOverlayEnabled[] = "overlayEnabled";
 constexpr char kKeyOverlayView[] = "overlayView";
+constexpr char kKeyAnimationsEnabled[] = "animationsEnabled";
 constexpr char kKeyDisclosure[] = "disclosure";
 constexpr char kKeyArrangement[] = "arrangement";
 constexpr char kKeyAlignment[] = "alignment";
@@ -78,6 +79,8 @@ constexpr bool kFollowSystemDefault = false;
 // The panel is the program: it comes up with the session unless it was
 // switched off, and switching it off is the deliberate act.
 constexpr bool kOverlayEnabledDefault = true;
+// Animations may be disabled without changing the active key highlights.
+constexpr bool kAnimationsEnabledDefault = true;
 
 // How far a panel put against an edge stops short of that edge's two ends.
 //
@@ -418,6 +421,7 @@ Settings::Settings(QString path)
     : m_showDelayMs(kShowDelayDefault),
       m_overlayView(QLatin1String(kOverlayViewDefault)),
       m_overlayEnabled(kOverlayEnabledDefault),
+      m_animationsEnabled(kAnimationsEnabledDefault),
       m_disclosure(QLatin1String(kDisclosureDefault)),
       m_arrangement(QLatin1String(kArrangementDefault)),
       m_alignment(QLatin1String(kAlignmentDefault)),
@@ -453,6 +457,7 @@ Settings::Settings(QString path)
     m_edgeInsetPx =
         read.integer(kKeyEdgeInset, kEdgeInsetDefault, kMarginMin, kMarginMax);
     m_overlayEnabled = read.boolean(kKeyOverlayEnabled, kOverlayEnabledDefault);
+    m_animationsEnabled = read.boolean(kKeyAnimationsEnabled, kAnimationsEnabledDefault);
     m_overlayView = read.word(kKeyOverlayView,
                               QLatin1String(kOverlayViewDefault),
                               knownOverlayViews());
@@ -483,6 +488,7 @@ Settings::Position Settings::position() const { return m_position; }
 int Settings::marginPx() const { return m_marginPx; }
 int Settings::edgeInsetPx() const { return m_edgeInsetPx; }
 bool Settings::overlayEnabled() const { return m_overlayEnabled; }
+bool Settings::animationsEnabled() const { return m_animationsEnabled; }
 QString Settings::disclosure() const { return m_disclosure; }
 
 QString Settings::arrangement() const { return m_arrangement; }
@@ -533,6 +539,7 @@ void Settings::setPosition(Position value) { m_position = value; }
 void Settings::setMarginPx(int value) { m_marginPx = value; }
 void Settings::setEdgeInsetPx(int value) { m_edgeInsetPx = value; }
 void Settings::setOverlayEnabled(bool value) { m_overlayEnabled = value; }
+void Settings::setAnimationsEnabled(bool value) { m_animationsEnabled = value; }
 void Settings::setDisclosure(const QString &value) { m_disclosure = value; }
 void Settings::setArrangement(const QString &value) { m_arrangement = value; }
 void Settings::setAlignment(const QString &value) { m_alignment = value; }
@@ -575,6 +582,8 @@ bool Settings::save(const QString &path) const {
         {QLatin1String(kKeyOverlayEnabled),
          m_overlayEnabled ? QStringLiteral("true") : QStringLiteral("false")},
         {QLatin1String(kKeyOverlayView), m_overlayView},
+        {QLatin1String(kKeyAnimationsEnabled),
+         m_animationsEnabled ? QStringLiteral("true") : QStringLiteral("false")},
         {QLatin1String(kKeyDisclosure), m_disclosure},
         {QLatin1String(kKeyArrangement), m_arrangement},
         {QLatin1String(kKeyAlignment), m_alignment},
@@ -756,7 +765,11 @@ bool Settings::writeTemplateIfMissing(const QString &path) {
         << kKeyBorder << "=" << kBorderDefault << "\n"
         << "# Background opacity, " << kOpacityMin << " to " << kOpacityMax
         << ". Use a point, not a comma.\n"
-        << kKeyOpacity << "=" << kOpacityDefault << "\n";
+        << kKeyOpacity << "=" << kOpacityDefault << "\n"
+        << "# Animate keycap highlights and action card transitions.\n"
+        << "# false disables nonessential motion, but keeps highlighted colors.\n"
+        << kKeyAnimationsEnabled << "="
+        << (kAnimationsEnabledDefault ? "true" : "false") << "\n";
     return true;
 }
 
