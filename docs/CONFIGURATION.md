@@ -26,7 +26,7 @@ visible before the file is written.
 | --- | --- | --- | --- |
 | `showDelayMs` | 0 to 5000 | `500` | How long a modifier has to be held before the panel appears. 0 shows it at once |
 | `overlayEnabled` | `true`, `false` | `true` | Whether the overlay process starts with the tray | 
-| `overlayView` | `list`, `keyboard` | `list` | Which layout appears on modifier hold: the classic shortcut list or a keyboard map. Both use the existing delay and dismiss on release |
+| `overlayView` | `list`, `keyboard`, `quick-actions`, `radial` | `list` | Which layout appears on modifier hold. Quick Actions shows shortcut cards and a compact keyboard; Radial shows up to five surrounding cards plus compact keycaps. All use the existing delay |
 | `position` | `center`, `left`, `right`, `top`, `bottom` | `bottom` | Where the panel sits. `center` floats in the middle |
 | `marginPx` | 0 to 400 | `14` | Distance to that edge. Ignored for `center` |
 | `edgeInsetPx` | 0 to 400 | `14` | How far a panel against an edge stops short of the two ends of it. 0 runs it corner to corner. Ignored for `center` |
@@ -44,11 +44,13 @@ visible before the file is written.
 | `borderWidthPx` | 0 to 16 | `1` | The frame of the panel |
 | `opacity` | 0.0 to 1.0 | `0.90` | How solid the panel is |
 
-Select **Overlay view** under Behaviour in the settings window. Choosing
-`keyboard` shows the non-interactive keyboard picture when modifiers are held
-instead of the classic list. It filters as modifiers are held and disappears
-when they are released or a shortcut fires. Selecting `list` returns to the
-original panel. Both layouts use the configured show delay.
+Select **Overlay view** under Behaviour in the settings window. Choose
+`list` for the original panel, `keyboard` for a full keyboard,
+`quick-actions` for a shortlist over a compact keyboard, or `radial` for
+five cards around the held modifiers and a compact keyboard. Every passive
+view filters on held modifiers, uses the configured delay, and disappears on
+release or shortcut execution. Action cards show actual compositor bindings;
+they do not run commands.
 
 The **Keyboard map → Open / close** button, `bindpeek --toggle`, and compositor
 hotkeys such as `bind = SUPER, K, exec, bindpeek --toggle` open an independent,

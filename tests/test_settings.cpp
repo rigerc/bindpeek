@@ -264,13 +264,22 @@ void TestSettings::overlayViewValidation() {
     const Settings defaults(dir.filePath(QStringLiteral("absent.conf")));
     QCOMPARE(defaults.overlayView(), QStringLiteral("list"));
     QCOMPARE(Settings::knownOverlayViews(),
-             QStringList({QStringLiteral("list"), QStringLiteral("keyboard")}));
+             QStringList({QStringLiteral("list"), QStringLiteral("keyboard"),
+                          QStringLiteral("quick-actions"), QStringLiteral("radial")}));
 
     const QString selected = writeFile(dir, QStringLiteral("overlayView=keyboard\n"));
     QVERIFY(!selected.isEmpty());
     const Settings selectedSettings(selected);
     QCOMPARE(selectedSettings.overlayView(), QStringLiteral("keyboard"));
     QVERIFY(selectedSettings.warnings().isEmpty());
+
+    const QString quick = writeFile(dir, QStringLiteral("overlayView=quick-actions\n"));
+    QVERIFY(!quick.isEmpty());
+    QCOMPARE(Settings(quick).overlayView(), QStringLiteral("quick-actions"));
+
+    const QString radial = writeFile(dir, QStringLiteral("overlayView=radial\n"));
+    QVERIFY(!radial.isEmpty());
+    QCOMPARE(Settings(radial).overlayView(), QStringLiteral("radial"));
 
     const QString invalid = writeFile(dir, QStringLiteral("overlayView=unknown\n"));
     QVERIFY(!invalid.isEmpty());
