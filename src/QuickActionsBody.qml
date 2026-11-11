@@ -97,12 +97,20 @@ Item {
                         required property int index
                         readonly property bool exact:
                             (modelData.modifiers || []).length === root.held.length
+                        readonly property bool pointed: board.hoveredCode !== ""
+                            && Shortcuts.canonical(modelData.key) === board.hoveredCode
                         width: content.width
                         height: root.rowHeight
                         radius: root.theme.radiusPill
                         color: exact ? root.theme.surfaceHover : root.theme.surface
                         border.width: exact ? 2 : 1
-                        border.color: exact ? root.theme.accent : root.theme.border
+                        border.color: pointed ? root.theme.text
+                                      : exact ? root.theme.accent : root.theme.border
+                        opacity: board.hoveredMatches.length > 0 && !pointed ? 0.5 : 1
+                        Behavior on opacity {
+                            enabled: root.theme.animationsEnabled
+                            NumberAnimation { duration: root.theme.cardAnimationDuration }
+                        }
                         // The row frames use the palette accent, while
                         // keyboard highlights still distinguish exact matches.
                         scale: exact ? 1.01 : 1
@@ -133,6 +141,7 @@ Item {
                             caption: modelData.key || "?"
                             available: true
                             exact: actionRow.exact
+                            hovered: actionRow.pointed
                             centered: true
                             captionSize: Math.max(10, root.theme.fontSizeBody)
                         }
@@ -179,11 +188,13 @@ Item {
                 }
                 Text {
                     width: parent.width
-                    text: root.actions.length > root.shown.length
+                    readonly property bool hovering: board.hoverSummary !== ""
+                    text: hovering ? board.hoverSummary
+                          : root.actions.length > root.shown.length
                           ? qsTr("+%1 more shortcuts. Hold another modifier to filter.")
                               .arg(root.actions.length - root.shown.length)
                           : qsTr("Release modifiers to hide  ·  Shortcuts run normally")
-                    color: root.theme.textMuted
+                    color: hovering ? root.theme.accent : root.theme.textMuted
                     font.family: root.theme.fontFamily
                     font.pixelSize: root.theme.fontSizeSmall
                     elide: Text.ElideRight
@@ -200,5 +211,14 @@ Item {
             compact: true
             unit: root.keyUnit
         }
+    }
+
+    // Hovering a key on the board lights it, its modifiers and its actions
+    // above; see KeyboardHover.qml.
+    property bool hoverHighlights: true
+    KeyboardHover {
+        anchors.fill: parent
+        keyboard: board
+        enabled: root.hoverHighlights
     }
 }

@@ -10,6 +10,7 @@ set(BINDPEEK_OVERLAY_QML
   Overlay.qml
   KeyboardBody.qml
   KeyboardBoard.qml
+  KeyboardHover.qml
   AnimatedKeycap.qml
   QuickActionsBody.qml
   RadialActionsBody.qml
@@ -32,6 +33,7 @@ set(BINDPEEK_EDITOR_QML
   editor/ThemedToolTip.qml
   KeyboardBody.qml
   KeyboardBoard.qml
+  KeyboardHover.qml
   AnimatedKeycap.qml
   QuickActionsBody.qml
   RadialActionsBody.qml

@@ -72,6 +72,62 @@ Item {
         return matches
     }
 
+    // The key under the pointer, set only by an interactive keyboard through
+    // hoverAt(). Empty when nothing is hovered, which is always the case for
+    // the passive, input-transparent views.
+    property string hoveredCode: ""
+    property string hoveredLabel: ""
+    readonly property var hoveredMatches: hoveredCode === "" ? [] : forKey(hoveredCode)
+    // Modifiers the hovered key's shortcuts use, lit on the board alongside it.
+    readonly property var hoveredModifiers: {
+        var mods = []
+        for (var i = 0; i < hoveredMatches.length; ++i) {
+            var list = hoveredMatches[i].modifiers || []
+            for (var j = 0; j < list.length; ++j)
+                if (mods.indexOf(list[j]) === -1)
+                    mods.push(list[j])
+        }
+        return mods
+    }
+
+    // One line naming the hovered key's shortcuts, for a view's hint line.
+    readonly property string hoverSummary: {
+        if (hoveredCode === "")
+            return ""
+        if (hoveredMatches.length === 0)
+            return qsTr("%1: no shortcuts with the held modifiers").arg(hoveredLabel)
+        return hoveredMatches.map(item => item.shortcut + "  " + item.description)
+                             .join("   •   ")
+    }
+
+    // Point in this item's coordinates. Walks Row > Column > Row > keycap,
+    // which is how the repeaters below nest.
+    function keyAt(px, py) {
+        var item = board
+        var x = px, y = py
+        for (var depth = 0; depth < 3 && item; ++depth) {
+            var child = item.childAt(x, y)
+            if (!child)
+                return null
+            var p = child.mapFromItem(item, x, y)
+            x = p.x
+            y = p.y
+            item = child
+        }
+        return item && item.info && item.info.code !== "" ? item.info : null
+    }
+
+    function hoverAt(px, py) {
+        var info = keyAt(px, py)
+        hoveredCode = info ? Shortcuts.canonical(info.code) : ""
+        hoveredLabel = info ? info.label : ""
+    }
+
+    function clearHover() {
+        hoveredCode = ""
+        hoveredLabel = ""
+    }
+
     readonly property int availableCount: Shortcuts.ordered(bindings, held).length
     readonly property var unplaced: {
         var codes = []
@@ -99,7 +155,13 @@ Item {
                 Repeater {
                     model: modelData
                     delegate: Row {
+                        id: keyRow
                         required property var modelData
+                        // Rows later in the column paint over earlier ones;
+                        // the hovered key's row is raised so its enlarged cap
+                        // stays on top of the row below.
+                        property bool holdsHover: false
+                        z: holdsHover ? 1 : 0
                         spacing: root.gap
                         Repeater {
                             model: modelData
@@ -117,6 +179,12 @@ Item {
                                 heldModifier: info.modifier !== ""
                                               && root.held.indexOf(info.modifier) !== -1
                                 blank: info.code === ""
+                                hovered: !blank && root.hoveredCode !== ""
+                                         && Shortcuts.canonical(info.code) === root.hoveredCode
+                                related: info.modifier !== ""
+                                         && root.hoveredModifiers.indexOf(info.modifier) !== -1
+                                dimmed: root.hoveredMatches.length > 0 && !hovered && !related
+                                onHoveredChanged: keyRow.holdsHover = hovered
                                 showDetail: root.showDescriptions
                                 centered: root.compact
                                 captionSize: Math.max(8, root.unit * (root.compact ? 0.34 : 0.25))

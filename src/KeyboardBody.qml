@@ -26,6 +26,8 @@ Item {
     // Switching from passive keyboard to the explicitly toggled view does not
     // change visibility, so the new interactive state must request focus too.
     onInteractiveChanged: if (interactive && visible) forceActiveFocus()
+    // Hovering a key lights it and its modifiers; see KeyboardHover.qml.
+    property bool hoverHighlights: true
     Keys.onPressed: event => {
         // When a compositor forwards the binding, Super+K toggles off too.
         if (interactive && (event.key === Qt.Key_Escape ||
@@ -96,20 +98,25 @@ Item {
             font.family: root.theme.fontFamily
             font.pixelSize: Math.max(10, root.unit * 0.20)
         }
+        // Shares one line with the hint below it, so hovering never resizes
+        // the surface (which would move it under the pointer).
         Text {
             width: board.implicitWidth
-            text: root.interactive
+            readonly property bool hovering: board.hoveredCode !== ""
+            text: hovering ? board.hoverSummary : root.interactive
                   ? qsTr("Hold modifiers to filter   •   Esc or click to close")
                   : qsTr("Release modifiers to hide   •   Shortcuts remain active")
-            color: root.theme.textMuted
+            elide: Text.ElideRight
+            color: hovering ? root.theme.accent : root.theme.textMuted
             font.family: root.theme.fontFamily
             font.pixelSize: Math.max(10, root.unit * 0.22)
         }
     }
 
-    MouseArea {
+    KeyboardHover {
         anchors.fill: parent
-        enabled: root.interactive
-        onClicked: root.closeRequested()
+        keyboard: board
+        enabled: root.interactive || root.hoverHighlights
+        onClicked: if (root.interactive) root.closeRequested()
     }
 }

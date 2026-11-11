@@ -13,22 +13,33 @@ Rectangle {
     property bool available: false
     property bool exact: false
     property bool heldModifier: false
+    // Pointer emphasis from the interactive keyboard: the key under the
+    // pointer, the modifier keys its shortcuts need, and everything else
+    // stepped back while that key has shortcuts to show.
+    property bool hovered: false
+    property bool related: false
+    property bool dimmed: false
     property bool blank: false
     property bool showDetail: false
     property bool centered: false
     property int captionSize: Math.max(10, theme.fontSizeBody)
     property int detailSize: Math.max(8, theme.fontSizeSmall)
-    readonly property bool lit: available || heldModifier
-    readonly property color highlightColor: heldModifier ? theme.accent
+    readonly property bool lit: available || heldModifier || hovered || related
+    readonly property bool modifierLit: heldModifier || related
+    readonly property color highlightColor: hovered ? theme.text
+                                            : modifierLit ? theme.accent
                                             : exact ? theme.brand : theme.accent
 
     radius: Math.max(3, theme.radiusPill)
     color: blank ? "transparent" : lit ? theme.surfaceHover : theme.surface
     border.width: blank ? 0 : lit ? 2 : theme.borderWidthKey
-    border.color: heldModifier ? theme.accent : exact ? theme.brand
-                  : available ? theme.accent : theme.border
-    scale: blank ? 1 : heldModifier ? 1.06 : exact ? 1.04
+    border.color: hovered ? theme.text : modifierLit ? theme.accent
+                  : exact ? theme.brand : available ? theme.accent : theme.border
+    scale: blank ? 1 : hovered ? 1.1 : modifierLit ? 1.06 : exact ? 1.04
            : available ? 1.02 : 1
+    // Lifted above its neighbours so the enlarged hovered cap is not clipped.
+    z: hovered ? 2 : modifierLit ? 1 : 0
+    opacity: dimmed && !blank ? 0.4 : 1
 
     Behavior on color {
         enabled: cap.theme.animationsEnabled
@@ -45,6 +56,10 @@ Rectangle {
         enabled: cap.theme.animationsEnabled
         ColorAnimation { duration: cap.theme.keyAnimationDuration }
     }
+    Behavior on opacity {
+        enabled: cap.theme.animationsEnabled
+        NumberAnimation { duration: cap.theme.keyAnimationDuration }
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -53,7 +68,7 @@ Rectangle {
         color: "transparent"
         border.width: 2
         border.color: cap.highlightColor
-        opacity: cap.blank ? 0 : cap.heldModifier ? 0.65
+        opacity: cap.blank ? 0 : cap.hovered ? 0.8 : cap.modifierLit ? 0.65
                  : cap.exact ? 0.42 : cap.available ? 0.22 : 0
         z: -1
         Behavior on opacity {
@@ -89,7 +104,7 @@ Rectangle {
             text: cap.caption
             elide: Text.ElideRight
             horizontalAlignment: cap.centered ? Text.AlignHCenter : Text.AlignLeft
-            color: cap.heldModifier ? cap.theme.accent : cap.theme.text
+            color: cap.modifierLit ? cap.theme.accent : cap.theme.text
             font.family: cap.theme.fontFamilyMono
             font.bold: cap.lit
             font.pixelSize: cap.captionSize

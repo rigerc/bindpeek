@@ -3,9 +3,9 @@
 
 import QtQuick
 
-// The window the cheat sheet lives in. Display only, and it takes no input at
-// all: the keyboard is watched below the compositor, so the keys stay where
-// they belong. Nothing here can run a command.
+// The window the cheat sheet lives in. Display only: the keyboard is watched
+// below the compositor, so the keys stay where they belong, and the pointer is
+// taken only to light up the key it hovers. Nothing here can run a command.
 //
 // What is drawn is PanelBody, the same item the settings window shows in its
 // preview. This file only says where it sits and when.
@@ -15,15 +15,19 @@ Window {
     // Frameless and transparent, the rounded panel below paints the whole
     // visible surface.
     //
-    // WindowTransparentForInput gives the surface an empty input region: the
+    // WindowTransparentForInput gives the list an empty input region: the
     // pointer falls straight through to whatever is underneath, so a click can
     // never land on the panel and the focus can never move to it. Together
     // with KeyboardInteractivityNone that makes the panel a pure bystander,
     // which is the whole point: the shortcut it shows has to keep working
     // while it is on screen.
-    // The original overlay passes through clicks. The explicit keyboard map
-    // instead accepts pointer and keyboard input until closed.
-    flags: Qt.FramelessWindowHint | (OverlayController.keyboardMode
+    //
+    // The list passes through clicks. Every view that draws a keyboard takes
+    // the pointer instead, so hovering a key can light up its shortcuts:
+    // clicks on the panel stop there, but keyboard interactivity stays none,
+    // so the keys and the focus still belong to the compositor. Only the
+    // explicit keyboard map also takes keyboard input until closed.
+    flags: Qt.FramelessWindowHint | (win.drawingKeyboard
                                       ? 0 : Qt.WindowTransparentForInput)
     color: "transparent"
 

@@ -90,6 +90,9 @@ make it a bystander:
   all, so the combination you are holding keeps working.
 - **The input region is empty.** The pointer falls straight through to whatever
   is underneath. You cannot click the panel, and the focus cannot move to it.
+  This holds for the `list` layout. The layouts that draw a keyboard take the
+  pointer, only to light up the key it hovers; keyboard interactivity stays
+  off for them too, so focus still cannot move to the panel.
 - **It reserves no space.** Nothing is pushed aside to make room.
 
 This is also the one hard requirement: `wlr-layer-shell` is a Wayland protocol

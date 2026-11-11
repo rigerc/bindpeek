@@ -161,7 +161,8 @@ reflect actual bindings; they never execute commands or intercept input.
 Choose **Behaviour → Overlay view → keyboard** in Settings to draw the
 keyboard instead of the list when you hold a modifier. It appears after the
 configured delay, updates as you add modifiers, and disappears on release or
-when you use a shortcut. This passive view does **not** capture keyboard input.
+when you use a shortcut. This passive view does **not** capture keyboard input;
+it only takes the pointer for [hover highlights](#hovering-keys).
 Selecting `list` restores the original modifier-held shortcut list.
 
 You can also open the keyboard independently with **Keyboard map → Open /
@@ -188,6 +189,22 @@ additional modifier have accent-colored outlines, and inactive keys are muted.
 Keycaps show descriptions; shortcuts for keys outside the illustrated layout
 appear in an overflow line below it. Press **Escape** or click the keyboard
 surface to close it.
+
+#### Hovering keys
+
+Every layout that draws a keyboard (the toggled keyboard, the hold-to-show
+`keyboard`, `quick-actions` and `radial` views, and their previews in Settings)
+highlights shortcuts under the pointer. Hover a key to light it together with
+the modifier keys its shortcuts use, fade the rest, and list those shortcuts in
+full on the hint line; in `quick-actions` and `radial` the matching action
+cards are outlined too. Hovering starts only once the pointer moves, so the key
+that happens to sit under the pointer when an overlay opens is never lit by
+itself.
+
+To make this possible those layouts accept the pointer while they are on
+screen, so a click on the panel stops there instead of reaching the window
+underneath. They still never take keyboard focus, and the `list` layout stays
+fully click-through.
 
 For a toggle hotkey in Hyprland:
 

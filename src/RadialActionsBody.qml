@@ -138,14 +138,22 @@ Item {
                     required property int index
                     readonly property bool exact:
                         (modelData.modifiers || []).length === root.held.length
+                    readonly property bool pointed: board.hoveredCode !== ""
+                        && Shortcuts.canonical(modelData.key) === board.hoveredCode
                     width: root.cardWidth
                     height: root.cardHeight
                     x: root.slotX(index) - width / 2
                     y: root.slotY(index) - height / 2
                     radius: root.theme.radiusPill * 2
                     color: root.theme.surface
-                    border.color: exact ? root.theme.accent : root.theme.borderFocus
-                    border.width: exact ? 2 : 1
+                    border.color: pointed ? root.theme.text
+                                  : exact ? root.theme.accent : root.theme.borderFocus
+                    border.width: exact || pointed ? 2 : 1
+                    opacity: board.hoveredMatches.length > 0 && !pointed ? 0.5 : 1
+                    Behavior on opacity {
+                        enabled: root.theme.animationsEnabled
+                        NumberAnimation { duration: root.theme.cardAnimationDuration }
+                    }
                     scale: exact ? 1.015 : 1
                     Behavior on scale {
                         enabled: root.theme.animationsEnabled
@@ -170,6 +178,7 @@ Item {
                             caption: modelData.key || "?"
                             available: true
                             exact: radialCard.exact
+                            hovered: radialCard.pointed
                             centered: true
                             captionSize: Math.max(10, root.theme.fontSizeBody)
                         }
@@ -219,12 +228,27 @@ Item {
             compact: true
             unit: root.keyUnit
         }
+        // Shares its line with the hovered key's shortcuts, so hovering never
+        // resizes the surface (which would move it under the pointer).
         Text {
+            readonly property bool hovering: board.hoverSummary !== ""
             anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Release modifiers to hide  ·  Shortcuts remain active")
-            color: root.theme.textMuted
+            width: Math.min(implicitWidth, root.orbitWidth)
+            text: hovering ? board.hoverSummary
+                  : qsTr("Release modifiers to hide  ·  Shortcuts remain active")
+            elide: Text.ElideRight
+            color: hovering ? root.theme.accent : root.theme.textMuted
             font.family: root.theme.fontFamily
             font.pixelSize: root.theme.fontSizeSmall
         }
+    }
+
+    // Hovering a key on the board lights it, its modifiers and its actions
+    // above; see KeyboardHover.qml.
+    property bool hoverHighlights: true
+    KeyboardHover {
+        anchors.fill: parent
+        keyboard: board
+        enabled: root.hoverHighlights
     }
 }
