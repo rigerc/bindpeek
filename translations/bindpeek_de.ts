@@ -172,6 +172,34 @@
         <translation>Das Panel ist aus. Auf dem Bildschirm erscheint nichts.</translation>
     </message>
     <message>
+        <source>Overlay view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quick Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radial Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyboard map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open / close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Grouped by</source>
         <translation>Gruppiert nach</translation>
     </message>
@@ -228,6 +256,10 @@
         <translation>Fläche</translation>
     </message>
     <message>
+        <source>Scale</source>
+        <translation>Skalierung</translation>
+    </message>
+    <message>
         <source>Corner radius</source>
         <translation>Eckenradius</translation>
     </message>
@@ -238,6 +270,10 @@
     <message>
         <source>Opacity</source>
         <translation>Deckkraft</translation>
+    </message>
+    <message>
+        <source>Animate keycaps</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Restore defaults</source>
@@ -264,8 +300,42 @@
         <translation>Fenster schließen</translation>
     </message>
     <message>
+        <source>Terminal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New terminal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>About</source>
         <translation>Über</translation>
+    </message>
+</context>
+<context>
+    <name>KeyboardBoard</name>
+    <message>
+        <source>%1: no shortcuts with the held modifiers</source>
+        <translation>%1: keine Tastenkürzel mit den gehaltenen Modifier-Tasten</translation>
+    </message>
+</context>
+<context>
+    <name>KeyboardBody</name>
+    <message>
+        <source>Hold modifiers to filter   •   Esc or click to close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release modifiers to hide   •   Shortcuts remain active</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -277,6 +347,60 @@
     <message>
         <source>More than fits here. Press another modifier to narrow it down.</source>
         <translation>Mehr als hier hineinpasst. Ein weiterer Modifier grenzt es ein.</translation>
+    </message>
+</context>
+<context>
+    <name>QuickActionsBody</name>
+    <message>
+        <source>ALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quick Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unnamed shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No shortcuts for these modifiers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+%1 more shortcuts. Hold another modifier to filter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release modifiers to hide  ·  Shortcuts run normally</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RadialActionsBody</name>
+    <message>
+        <source>RADIAL ACTIONS  ·  %1 available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ALL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unnamed shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+%1 more: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release modifiers to hide  ·  Shortcuts remain active</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -870,6 +994,10 @@
 <context>
     <name>bindpeek::OverlayProcess</name>
     <message>
+        <source>Unable to launch the keyboard overlay.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>A panel from an earlier version is still running and did not make way. Settings may not reach it.</source>
         <translation>Ein Panel aus einer früheren Version läuft noch und hat nicht Platz gemacht. Einstellungen erreichen es womöglich nicht.</translation>
     </message>
@@ -908,6 +1036,10 @@
         <translation>Kürzel als Text ausgeben statt das Overlay zu zeigen.</translation>
     </message>
     <message>
+        <source>Toggle the keyboard map (start it if needed).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Force the environment: %1.</source>
         <translation>Umgebung erzwingen: %1.</translation>
     </message>
@@ -926,6 +1058,10 @@
     <message>
         <source>Print the held modifiers as they change, for checking that the keyboard service is reachable.</source>
         <translation>Gehaltene Modifier bei jeder Änderung ausgeben, zur Prüfung ob der Tastaturdienst erreichbar ist.</translation>
+    </message>
+    <message>
+        <source>Cannot listen on %1: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No supported environment detected. Force one with --environment %1.</source>

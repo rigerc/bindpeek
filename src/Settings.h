@@ -192,6 +192,8 @@ public:
     // Panel background opacity, 0.0 to 1.0. At 0 the plate disappears and only
     // text and border remain.
     double opacity() const;
+    // Size of every overlay view in percent of its natural size, 50 to 200.
+    int scalePercent() const;
 
     // --- Diagnostics ------------------------------------------------------
 
@@ -222,6 +224,8 @@ public:
     // Same for the opacity, whose range is a single unit wide and therefore
     // needs a step smaller than one.
     static double opacityStep();
+    static Range scaleRange();
+    static int scaleStepPercent();
 
     // ~/.config/bindpeek/bindpeek.conf
     static QString defaultPath();
@@ -257,6 +261,7 @@ public:
     void setCornerRadiusPx(int value);
     void setBorderWidthPx(int value);
     void setOpacity(double value);
+    void setScalePercent(int value);
 
     // Writes a commented template when no file exists yet, so the settings are
     // discoverable without documentation. Never touches an existing file.
@@ -315,6 +320,7 @@ private:
     int m_cornerRadiusPx;
     int m_borderWidthPx;
     double m_opacity;
+    int m_scalePercent;
     QStringList m_warnings;
 };
 

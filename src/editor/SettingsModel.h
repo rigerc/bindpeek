@@ -62,6 +62,8 @@ class SettingsModel : public QObject {
     Q_PROPERTY(int borderWidthPx READ borderWidthPx WRITE setBorderWidthPx
                    NOTIFY changed)
     Q_PROPERTY(double opacity READ opacity WRITE setOpacity NOTIFY changed)
+    Q_PROPERTY(
+        int scalePercent READ scalePercent WRITE setScalePercent NOTIFY changed)
 
     // Choices the editor offers, taken from Settings so the two cannot drift.
     Q_PROPERTY(QStringList themes READ themes CONSTANT)
@@ -93,6 +95,9 @@ class SettingsModel : public QObject {
     Q_PROPERTY(double opacityMin READ opacityMin CONSTANT)
     Q_PROPERTY(double opacityMax READ opacityMax CONSTANT)
     Q_PROPERTY(double opacityStep READ opacityStep CONSTANT)
+    Q_PROPERTY(int scaleMin READ scaleMin CONSTANT)
+    Q_PROPERTY(int scaleMax READ scaleMax CONSTANT)
+    Q_PROPERTY(int scaleStep READ scaleStep CONSTANT)
 
     // Whether the chosen position has an edge at all. The controls that only
     // mean something against one are disabled without it, and asking here
@@ -122,6 +127,7 @@ public:
     int cornerRadiusPx() const;
     int borderWidthPx() const;
     double opacity() const;
+    int scalePercent() const;
 
     void setShowDelayMs(int value);
     void setPosition(const QString &value);
@@ -143,6 +149,7 @@ public:
     void setCornerRadiusPx(int value);
     void setBorderWidthPx(int value);
     void setOpacity(double value);
+    void setScalePercent(int value);
 
     QStringList themes() const;
     QStringList positions() const;
@@ -168,6 +175,9 @@ public:
     double opacityMin() const;
     double opacityMax() const;
     double opacityStep() const;
+    int scaleMin() const;
+    int scaleMax() const;
+    int scaleStep() const;
 
     bool anchoredToEdge() const;
 

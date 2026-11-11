@@ -977,6 +977,22 @@ Window {
                             text: qsTr("Surface")
                         }
 
+                        // Every overlay view at once: the list through its
+                        // font size, the keyboards through their keys.
+                        Row_ {
+                            label: qsTr("Scale")
+                            ValueSlider {
+                                from: SettingsModel.scaleMin
+                                to: SettingsModel.scaleMax
+                                stepSize: SettingsModel.scaleStep
+                                value: SettingsModel.scalePercent
+                                suffix: " %"
+                                onMoved: function (v) {
+                                    SettingsModel.scalePercent = Math.round(v);
+                                }
+                            }
+                        }
+
                         Row_ {
                             label: qsTr("Corner radius")
                             ValueSlider {

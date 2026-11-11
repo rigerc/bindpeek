@@ -38,6 +38,7 @@ constexpr char kKeyFontSize[] = "fontSizePt";
 constexpr char kKeyRadius[] = "cornerRadiusPx";
 constexpr char kKeyBorder[] = "borderWidthPx";
 constexpr char kKeyOpacity[] = "opacity";
+constexpr char kKeyScale[] = "scalePercent";
 
 // Defaults and accepted ranges. The bounds are not technical limits but
 // guards against a typo that would make the panel look broken: a delay that
@@ -69,6 +70,14 @@ constexpr double kOpacityDefault = 0.90;
 constexpr double kOpacityMin = 0.0;
 constexpr double kOpacityMax = 1.0;
 constexpr double kOpacityStep = 0.01;
+
+// How large the overlays are drawn, in percent of their natural size. Half
+// is still legible on a large screen; double still fits a small one, and a
+// keyboard that would run past the screen is held at what fits.
+constexpr int kScaleDefault = 100;
+constexpr int kScaleMin = 50;
+constexpr int kScaleMax = 200;
+constexpr int kScaleStep = 5;
 
 // Off at a first start: the panel comes up in the house palette, which is
 // what the program looks like. Following the desktop is a choice made in the
@@ -327,6 +336,8 @@ Settings::Range Settings::borderWidthRange() {
 double Settings::opacityLow() { return kOpacityMin; }
 double Settings::opacityHigh() { return kOpacityMax; }
 double Settings::opacityStep() { return kOpacityStep; }
+Settings::Range Settings::scaleRange() { return {kScaleMin, kScaleMax}; }
+int Settings::scaleStepPercent() { return kScaleStep; }
 
 QStringList Settings::knownAlignments() {
     return {QLatin1String(alignment::kStart), QLatin1String(alignment::kCenter),
@@ -432,7 +443,8 @@ Settings::Settings(QString path)
       m_themeLight(QLatin1String(kThemeLightDefault)),
       m_themeDark(QLatin1String(kThemeDarkDefault)),
       m_fontSizePt(kFontSizeDefault), m_cornerRadiusPx(kRadiusDefault),
-      m_borderWidthPx(kBorderDefault), m_opacity(kOpacityDefault) {
+      m_borderWidthPx(kBorderDefault), m_opacity(kOpacityDefault),
+      m_scalePercent(kScaleDefault) {
     const QString file = path.isEmpty() ? defaultPath() : std::move(path);
     if (!QFileInfo::exists(file)) {
         return;
@@ -453,6 +465,8 @@ Settings::Settings(QString path)
         read.integer(kKeyBorder, kBorderDefault, kBorderMin, kBorderMax);
     m_opacity =
         read.number(kKeyOpacity, kOpacityDefault, kOpacityMin, kOpacityMax);
+    m_scalePercent =
+        read.integer(kKeyScale, kScaleDefault, kScaleMin, kScaleMax);
     m_followSystemScheme = read.boolean(kKeyFollowSystem, kFollowSystemDefault);
     m_edgeInsetPx =
         read.integer(kKeyEdgeInset, kEdgeInsetDefault, kMarginMin, kMarginMax);
@@ -531,6 +545,7 @@ int Settings::fontSizePt() const { return m_fontSizePt; }
 int Settings::cornerRadiusPx() const { return m_cornerRadiusPx; }
 int Settings::borderWidthPx() const { return m_borderWidthPx; }
 double Settings::opacity() const { return m_opacity; }
+int Settings::scalePercent() const { return m_scalePercent; }
 QStringList Settings::warnings() const { return m_warnings; }
 
 void Settings::setShowDelayMs(int value) { m_showDelayMs = value; }
@@ -555,6 +570,7 @@ void Settings::setFontSizePt(int value) { m_fontSizePt = value; }
 void Settings::setCornerRadiusPx(int value) { m_cornerRadiusPx = value; }
 void Settings::setBorderWidthPx(int value) { m_borderWidthPx = value; }
 void Settings::setOpacity(double value) { m_opacity = value; }
+void Settings::setScalePercent(int value) { m_scalePercent = value; }
 
 // Updates the file in place, one line at a time.
 //
@@ -600,6 +616,7 @@ bool Settings::save(const QString &path) const {
         {QLatin1String(kKeyRadius), QString::number(m_cornerRadiusPx)},
         {QLatin1String(kKeyBorder), QString::number(m_borderWidthPx)},
         {QLatin1String(kKeyOpacity), QString::number(m_opacity, 'f', 2)},
+        {QLatin1String(kKeyScale), QString::number(m_scalePercent)},
     };
 
     QStringList lines;
@@ -766,6 +783,9 @@ bool Settings::writeTemplateIfMissing(const QString &path) {
         << "# Background opacity, " << kOpacityMin << " to " << kOpacityMax
         << ". Use a point, not a comma.\n"
         << kKeyOpacity << "=" << kOpacityDefault << "\n"
+        << "# Overlay size in percent, " << kScaleMin << " to " << kScaleMax
+        << ". Scales every view.\n"
+        << kKeyScale << "=" << kScaleDefault << "\n"
         << "# Animate keycap highlights and action card transitions.\n"
         << "# false disables nonessential motion, but keeps highlighted colors.\n"
         << kKeyAnimationsEnabled << "="

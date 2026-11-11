@@ -292,8 +292,13 @@ QtObject {
     // from a different family per symbol.
     readonly property string fontFamilyIcon: pickFamily(["DejaVu Sans", "Noto Sans Symbols 2", "Symbola", "sans-serif"])
 
+    // The scale setting as a factor, 1 being the natural size. The list
+    // follows it through its font size, from which every one of its measures
+    // is derived; the keyboard views multiply their own measures by it.
+    readonly property real overlayScale: Appearance.overlayScale
+
     // The size that was asked for, which is the largest the panel may use.
-    readonly property int configuredFontSizePt: Appearance.fontSizePt
+    readonly property int configuredFontSizePt: Math.max(1, Math.round(Appearance.fontSizePt * overlayScale))
 
     // The size actually set in.
     //

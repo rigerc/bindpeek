@@ -70,6 +70,7 @@ void Appearance::apply(const Settings &settings) {
     m_cornerRadius = settings.cornerRadiusPx();
     m_borderWidth = settings.borderWidthPx();
     m_opacity = settings.opacity();
+    m_overlayScale = settings.scalePercent() / 100.0;
     m_animationsEnabled = settings.animationsEnabled();
 
     // The panel asks what to draw, not what the setting is called; Settings
@@ -177,6 +178,7 @@ int Appearance::fontSizePt() const { return m_fontSizePt; }
 int Appearance::cornerRadius() const { return m_cornerRadius; }
 int Appearance::borderWidth() const { return m_borderWidth; }
 double Appearance::opacity() const { return m_opacity; }
+double Appearance::overlayScale() const { return m_overlayScale; }
 bool Appearance::animationsEnabled() const { return m_animationsEnabled; }
 bool Appearance::alignsAtStart() const { return m_alignsAtStart; }
 

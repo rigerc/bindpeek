@@ -51,6 +51,7 @@ private slots:
     void saveAppendsMissingKeys();
     void overlayViewValidation();
     void animationsEnabledValidation();
+    void scalePercentValidation();
 };
 
 void TestSettings::missingFileUsesDefault() {
@@ -61,6 +62,7 @@ void TestSettings::missingFileUsesDefault() {
         dir.filePath(QStringLiteral("does-not-exist.conf")));
     QCOMPARE(settings.showDelayMs(), kExpectedDefault);
     QCOMPARE(settings.animationsEnabled(), true);
+    QCOMPARE(settings.scalePercent(), 100);
     // A missing file is the normal case, not something to complain about.
     QVERIFY(settings.warnings().isEmpty());
 }
@@ -204,6 +206,7 @@ void TestSettings::saveRoundTripsEveryValue() {
     written.setCornerRadiusPx(0);
     written.setBorderWidthPx(2);
     written.setOpacity(0.5);
+    written.setScalePercent(135);
     QVERIFY(written.save(path));
 
     // Everything has to come back unchanged and without a complaint: what the
@@ -238,6 +241,7 @@ void TestSettings::saveRoundTripsEveryValue() {
     QCOMPARE(read.cornerRadiusPx(), 0);
     QCOMPARE(read.borderWidthPx(), 2);
     QCOMPARE(read.opacity(), 0.5);
+    QCOMPARE(read.scalePercent(), 135);
 }
 
 void TestSettings::saveAppendsMissingKeys() {
@@ -305,6 +309,22 @@ void TestSettings::animationsEnabledValidation() {
     QVERIFY(!invalid.isEmpty());
     const Settings fallback(invalid);
     QCOMPARE(fallback.animationsEnabled(), true);
+    QVERIFY(!fallback.warnings().isEmpty());
+}
+
+void TestSettings::scalePercentValidation() {
+    // A directory per case: QSettings caches a file by its path within the
+    // process, so rewriting one path would read back the first contents.
+    const auto read = [](const QString &content) {
+        QTemporaryDir dir;
+        const QString path = writeFile(dir, content);
+        return Settings(path);
+    };
+    QCOMPARE(read(QStringLiteral("scalePercent=50\n")).scalePercent(), 50);
+    QCOMPARE(read(QStringLiteral("scalePercent=200\n")).scalePercent(), 200);
+    // Outside the range a panel would be unreadable or run off the screen.
+    const Settings fallback = read(QStringLiteral("scalePercent=400\n"));
+    QCOMPARE(fallback.scalePercent(), 100);
     QVERIFY(!fallback.warnings().isEmpty());
 }
 

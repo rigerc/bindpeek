@@ -12,18 +12,27 @@ Item {
     property var bindings: []
     property var held: []
 
-    readonly property int padding: Math.max(12, Math.round(theme.fontSizeBody * 1.1))
-    readonly property int gap: Math.max(8, Math.round(theme.fontSizeBody * 0.8))
-    readonly property int keyUnit: Math.max(17, Math.min(38,
-        Math.floor((theme.screenWidth - 90) / 19),
-        Math.floor((theme.screenHeight - 350) / 7)))
-    readonly property int rowHeight: Math.max(36, Math.min(52, theme.fontSizeBody * 3))
-    readonly property int maxRows: theme.screenHeight < 780 ? 4
-                                    : theme.screenHeight < 1000 ? 5 : 7
+    // The scale setting. Fonts already follow it through the theme; the
+    // fixed measures below are multiplied by it, and the ones tied to the
+    // screen stop growing at what fits.
+    readonly property real s: theme.overlayScale
+    readonly property int padding: Math.max(12 * s, Math.round(theme.fontSizeBody * 1.1))
+    readonly property int gap: Math.max(8 * s, Math.round(theme.fontSizeBody * 0.8))
+    readonly property real fitKeyUnit: Math.min((theme.screenWidth - 90) / 19,
+                                                (theme.screenHeight - 350) / 7)
+    readonly property real naturalKeyUnit: Math.max(17, Math.min(38, fitKeyUnit))
+    readonly property int keyUnit: Math.floor(Math.max(9,
+        Math.min(naturalKeyUnit * s, Math.max(naturalKeyUnit, fitKeyUnit))))
+    readonly property int rowHeight: Math.max(36 * s, Math.min(52 * s, theme.fontSizeBody * 3))
+    // Fewer rows on a short screen, and fewer again when they are drawn large.
+    readonly property int maxRows: Math.min(theme.screenHeight < 780 ? 4
+                                            : theme.screenHeight < 1000 ? 5 : 7,
+                                            Math.max(2, Math.floor(theme.screenHeight * 0.36
+                                                                   / (rowHeight + gap))))
     readonly property var actions: Shortcuts.ordered(bindings, held)
     readonly property var shown: actions.slice(0, maxRows)
     readonly property int cardWidth: Math.max(board.implicitWidth,
-                                             Math.min(620, theme.screenWidth - 64))
+                                             Math.min(620 * s, theme.screenWidth - 64))
 
     implicitWidth: stack.implicitWidth + padding * 2
     implicitHeight: stack.implicitHeight + padding * 2
@@ -61,8 +70,8 @@ Item {
                 Row {
                     spacing: root.gap
                     Rectangle {
-                        width: Math.max(66, root.theme.fontSizeBody * 5)
-                        height: Math.max(34, root.theme.fontSizeBody * 2.5)
+                        width: Math.max(66 * root.s, root.theme.fontSizeBody * 5)
+                        height: Math.max(34 * root.s, root.theme.fontSizeBody * 2.5)
                         radius: root.theme.radiusPill
                         color: root.theme.surfaceHover
                         border.color: root.theme.accent
@@ -72,7 +81,7 @@ Item {
                             text: root.held.length ? root.held.join("+") : qsTr("ALL")
                             color: root.theme.text
                             font.family: root.theme.fontFamilyMono
-                            font.pixelSize: Math.max(11, root.theme.fontSizeBody)
+                            font.pixelSize: Math.max(11 * root.s, root.theme.fontSizeBody)
                             font.bold: true
                             elide: Text.ElideRight
                             width: parent.width - 6
@@ -84,7 +93,7 @@ Item {
                         color: root.theme.text
                         font.family: root.theme.fontFamily
                         font.bold: true
-                        font.pixelSize: Math.max(15, root.theme.fontSizeTitle)
+                        font.pixelSize: Math.max(15 * root.s, root.theme.fontSizeTitle)
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -134,7 +143,7 @@ Item {
                             id: keycap
                             x: root.gap / 2
                             anchors.verticalCenter: parent.verticalCenter
-                            width: Math.max(44, root.theme.fontSizeBody * 3.6)
+                            width: Math.max(44 * root.s, root.theme.fontSizeBody * 3.6)
                             height: parent.height - root.gap
                             radius: root.theme.radiusPill
                             theme: root.theme
@@ -143,12 +152,12 @@ Item {
                             exact: actionRow.exact
                             hovered: actionRow.pointed
                             centered: true
-                            captionSize: Math.max(10, root.theme.fontSizeBody)
+                            captionSize: Math.max(10 * root.s, root.theme.fontSizeBody)
                         }
                         Text {
                             x: keycap.x + keycap.width + root.gap
                             anchors.verticalCenter: parent.verticalCenter
-                            width: Math.max(70, parent.width - x - root.gap - shortcut.width - root.gap)
+                            width: Math.max(70 * root.s, parent.width - x - root.gap - shortcut.width - root.gap)
                             text: modelData.description || modelData.shortcut || qsTr("Unnamed shortcut")
                             elide: Text.ElideRight
                             color: root.theme.text
@@ -163,9 +172,9 @@ Item {
                             text: modelData.shortcut || ""
                             color: root.theme.textMuted
                             font.family: root.theme.fontFamilyMono
-                            font.pixelSize: Math.max(10, root.theme.fontSizeSmall)
+                            font.pixelSize: Math.max(10 * root.s, root.theme.fontSizeSmall)
                             elide: Text.ElideLeft
-                            width: Math.min(180, root.cardWidth * 0.29)
+                            width: Math.min(180 * root.s, root.cardWidth * 0.29)
                             horizontalAlignment: Text.AlignRight
                         }
                     }

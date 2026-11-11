@@ -43,6 +43,7 @@ visible before the file is written.
 | `cornerRadiusPx` | 0 to 64 | `14` | The rounding of the panel |
 | `borderWidthPx` | 0 to 16 | `1` | The frame of the panel |
 | `opacity` | 0.0 to 1.0 | `0.90` | How solid the panel is |
+| `scalePercent` | 50 to 200 | `100` | How large every overlay view is drawn. The list scales its font size; the keyboard, Quick Actions and Radial views scale their keys and cards, but never past what fits on the screen |
 | `animationsEnabled` | `true`, `false` | `true` | Animate keycap glow, color and scale transitions across the list, full keyboard, Quick Actions, and Radial layouts. `false` keeps highlight colors but removes motion |
 
 The **Animate keycaps** switch under Surface controls short, Keyviz-inspired

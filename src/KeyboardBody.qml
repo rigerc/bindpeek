@@ -15,9 +15,15 @@ Item {
     property bool interactive: true
     signal closeRequested()
     readonly property int gap: Math.max(3, Math.round(unit * 0.09))
-    readonly property int unit: Math.floor(Math.max(28, Math.min(58,
-                           (theme.screenWidth - 80) / 24,
-                           (theme.screenHeight - 190) / 8)))
+    // The key size the screen leaves room for, the natural size taken from
+    // that, and the natural size scaled by the setting. Scaling up stops at
+    // what fits, so a keyboard never runs past the edge of its output.
+    readonly property real fitUnit: Math.min((theme.screenWidth - 80) / 24,
+                                             (theme.screenHeight - 190) / 8)
+    readonly property real naturalUnit: Math.max(28, Math.min(58, fitUnit))
+    readonly property int unit: Math.floor(Math.max(14,
+                           Math.min(naturalUnit * theme.overlayScale,
+                                    Math.max(naturalUnit, fitUnit))))
     readonly property int padding: Math.round(unit * 0.34)
     implicitWidth: content.implicitWidth + 2 * padding
     implicitHeight: content.implicitHeight + 2 * padding

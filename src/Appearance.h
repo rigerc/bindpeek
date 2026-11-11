@@ -52,6 +52,8 @@ class Appearance : public QObject {
     Q_PROPERTY(int cornerRadius READ cornerRadius NOTIFY changed)
     Q_PROPERTY(int borderWidth READ borderWidth NOTIFY changed)
     Q_PROPERTY(double opacity READ opacity NOTIFY changed)
+    // The scale setting as a factor, 1.0 being the natural size.
+    Q_PROPERTY(double overlayScale READ overlayScale NOTIFY changed)
     Q_PROPERTY(bool animationsEnabled READ animationsEnabled NOTIFY changed)
     // What becomes of the shortcuts that need a further modifier: whether
     // they are listed at all, and if they are, how. All three false is the
@@ -116,6 +118,7 @@ public:
     int cornerRadius() const;
     int borderWidth() const;
     double opacity() const;
+    double overlayScale() const;
     bool animationsEnabled() const;
     bool showsDeeper() const;
     bool deeperInSections() const;
@@ -184,6 +187,7 @@ private:
     int m_cornerRadius;
     int m_borderWidth;
     double m_opacity;
+    double m_overlayScale = 1.0;
     bool m_animationsEnabled = true;
     bool m_showsDeeper = false;
     bool m_deeperInSections = false;

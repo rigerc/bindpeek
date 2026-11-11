@@ -72,6 +72,7 @@ int SettingsModel::cornerRadiusPx() const {
 }
 int SettingsModel::borderWidthPx() const { return m_settings.borderWidthPx(); }
 double SettingsModel::opacity() const { return m_settings.opacity(); }
+int SettingsModel::scalePercent() const { return m_settings.scalePercent(); }
 
 // Each setter guards against a no-op so a binding cannot loop, then announces
 // the change once. QML rebinds the preview from there.
@@ -104,6 +105,7 @@ BINDPEEK_SETTER(setFontFamily, const QString &, fontFamily, setFontFamily)
 BINDPEEK_SETTER(setFontSizePt, int, fontSizePt, setFontSizePt)
 BINDPEEK_SETTER(setCornerRadiusPx, int, cornerRadiusPx, setCornerRadiusPx)
 BINDPEEK_SETTER(setBorderWidthPx, int, borderWidthPx, setBorderWidthPx)
+BINDPEEK_SETTER(setScalePercent, int, scalePercent, setScalePercent)
 
 #undef BINDPEEK_SETTER
 
@@ -191,6 +193,9 @@ int SettingsModel::borderMax() const {
 double SettingsModel::opacityMin() const { return Settings::opacityLow(); }
 double SettingsModel::opacityMax() const { return Settings::opacityHigh(); }
 double SettingsModel::opacityStep() const { return Settings::opacityStep(); }
+int SettingsModel::scaleMin() const { return Settings::scaleRange().low; }
+int SettingsModel::scaleMax() const { return Settings::scaleRange().high; }
+int SettingsModel::scaleStep() const { return Settings::scaleStepPercent(); }
 
 bool SettingsModel::anchoredToEdge() const {
     return m_settings.anchoredToEdge();

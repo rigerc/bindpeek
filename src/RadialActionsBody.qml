@@ -14,15 +14,25 @@ Item {
 
     readonly property var actions: Shortcuts.ordered(bindings, held)
     readonly property var shown: actions.slice(0, 5)
-    readonly property int padding: Math.max(12, theme.fontSizeBody)
-    readonly property int gap: Math.max(8, Math.round(theme.fontSizeBody * 0.8))
-    readonly property int keyUnit: Math.max(17, Math.min(38,
-        Math.floor((theme.screenWidth - 90) / 19),
-        Math.floor((theme.screenHeight - 420) / 7)))
-    readonly property int cardWidth: Math.max(118, Math.min(210, Math.round(theme.screenWidth * 0.22)))
-    readonly property int cardHeight: Math.max(48, theme.fontSizeBody * 3.8)
+    // The scale setting. Fonts already follow it through the theme; the
+    // fixed measures below are multiplied by it, and the ones tied to the
+    // screen stop growing at what fits.
+    readonly property real s: theme.overlayScale
+    readonly property int padding: Math.max(12 * s, theme.fontSizeBody)
+    readonly property int gap: Math.max(8 * s, Math.round(theme.fontSizeBody * 0.8))
+    readonly property real fitKeyUnit: Math.min((theme.screenWidth - 90) / 19,
+                                                (theme.screenHeight - 420) / 7)
+    readonly property real naturalKeyUnit: Math.max(17, Math.min(38, fitKeyUnit))
+    readonly property int keyUnit: Math.floor(Math.max(9,
+        Math.min(naturalKeyUnit * s, Math.max(naturalKeyUnit, fitKeyUnit))))
+    readonly property int cardWidth: Math.round(Math.min(
+        Math.max(118, Math.min(210, theme.screenWidth * 0.22)) * s,
+        (theme.screenWidth - 64) / 3.5))
+    readonly property int cardHeight: Math.max(48 * s, theme.fontSizeBody * 3.8)
     readonly property int orbitWidth: Math.max(board.implicitWidth, Math.round(cardWidth * 3.5))
-    readonly property int orbitHeight: Math.max(260, Math.min(380, Math.round(theme.screenHeight * 0.42)))
+    readonly property int orbitHeight: Math.round(Math.min(
+        Math.max(260, Math.min(380, theme.screenHeight * 0.42)) * s,
+        theme.screenHeight * 0.5))
     readonly property var slots: [
         {x: 0.50, y: 0.14},
         {x: 0.79, y: 0.36},
@@ -61,7 +71,7 @@ Item {
             color: root.theme.text
             font.family: root.theme.fontFamilyMono
             font.bold: true
-            font.pixelSize: Math.max(12, root.theme.fontSizeBody)
+            font.pixelSize: Math.max(12 * root.s, root.theme.fontSizeBody)
         }
 
         Item {
@@ -99,7 +109,7 @@ Item {
 
             Rectangle {
                 id: center
-                width: Math.max(72, root.theme.fontSizeBody * 5.5)
+                width: Math.max(72 * root.s, root.theme.fontSizeBody * 5.5)
                 height: width
                 x: orbit.width / 2 - width / 2
                 y: orbit.height * 0.48 - height / 2
@@ -124,7 +134,7 @@ Item {
                     color: root.theme.text
                     font.family: root.theme.fontFamilyMono
                     font.bold: true
-                    font.pixelSize: Math.max(12, root.theme.fontSizeBody * 1.15)
+                    font.pixelSize: Math.max(12 * root.s, root.theme.fontSizeBody * 1.15)
                     elide: Text.ElideRight
                     wrapMode: Text.WrapAnywhere
                 }
@@ -171,8 +181,8 @@ Item {
                         spacing: root.gap / 2
                         AnimatedKeycap {
                             id: actionKey
-                            width: Math.max(31, root.theme.fontSizeBody * 2.4)
-                            height: Math.max(28, root.theme.fontSizeBody * 2.2)
+                            width: Math.max(31 * root.s, root.theme.fontSizeBody * 2.4)
+                            height: Math.max(28 * root.s, root.theme.fontSizeBody * 2.2)
                             radius: root.theme.radiusPill
                             theme: root.theme
                             caption: modelData.key || "?"
@@ -180,7 +190,7 @@ Item {
                             exact: radialCard.exact
                             hovered: radialCard.pointed
                             centered: true
-                            captionSize: Math.max(10, root.theme.fontSizeBody)
+                            captionSize: Math.max(10 * root.s, root.theme.fontSizeBody)
                         }
                         Text {
                             width: root.cardWidth - actionKey.width - root.gap * 2

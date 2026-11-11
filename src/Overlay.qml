@@ -74,13 +74,27 @@ Window {
         : win.passiveView === "quick-actions" ? quickActions
         : win.passiveView === "radial" ? radialActions
         : panel
+    // A keyboard view at a large scale setting can want more room than its
+    // output has. It is then drawn smaller as a whole, so nothing runs past
+    // the edge; at sizes that fit this is 1 and changes nothing. The list
+    // fits itself by lowering its font size instead.
+    readonly property int fitMarginPx: 48
+    function fitFactor(item) {
+        return Math.min(1,
+                        (theme.screenWidth - win.fitMarginPx) / Math.max(1, item.implicitWidth),
+                        (theme.screenHeight - win.fitMarginPx) / Math.max(1, item.implicitHeight))
+    }
     Binding on width {
         when: win.drawingKeyboard || !Appearance.spanHorizontal
-        value: win.activeVisual.implicitWidth
+        value: win.drawingKeyboard
+               ? Math.ceil(win.activeVisual.implicitWidth * win.fitFactor(win.activeVisual))
+               : win.activeVisual.implicitWidth
     }
     Binding on height {
         when: win.drawingKeyboard || !Appearance.spanVertical
-        value: win.activeVisual.implicitHeight
+        value: win.drawingKeyboard
+               ? Math.ceil(win.activeVisual.implicitHeight * win.fitFactor(win.activeVisual))
+               : win.activeVisual.implicitHeight
     }
 
     // The panel is measured against the output it is actually on. Under a
@@ -145,6 +159,12 @@ Window {
     KeyboardBody {
         id: keyboard
         anchors.centerIn: parent
+        transform: Scale {
+            origin.x: keyboard.width / 2
+            origin.y: keyboard.height / 2
+            xScale: win.fitFactor(keyboard)
+            yScale: win.fitFactor(keyboard)
+        }
         theme: theme
         bindings: OverlayController.keyboardBinds
         held: OverlayController.heldModifiers
@@ -173,6 +193,12 @@ Window {
     QuickActionsBody {
         id: quickActions
         anchors.centerIn: parent
+        transform: Scale {
+            origin.x: quickActions.width / 2
+            origin.y: quickActions.height / 2
+            xScale: win.fitFactor(quickActions)
+            yScale: win.fitFactor(quickActions)
+        }
         theme: theme
         bindings: OverlayController.keyboardBinds
         held: OverlayController.heldModifiers
@@ -199,6 +225,12 @@ Window {
     RadialActionsBody {
         id: radialActions
         anchors.centerIn: parent
+        transform: Scale {
+            origin.x: radialActions.width / 2
+            origin.y: radialActions.height / 2
+            xScale: win.fitFactor(radialActions)
+            yScale: win.fitFactor(radialActions)
+        }
         theme: theme
         bindings: OverlayController.keyboardBinds
         held: OverlayController.heldModifiers
